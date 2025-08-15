@@ -70,8 +70,8 @@ document.addEventListener("DOMContentLoaded", function() {
         ]
     };
 
-    // --- PROCESSAMENTO INICIAL DOS DADOS (executado apenas uma vez) ---
-    const processedData = JSON.parse(JSON.stringify(data)); // Cria uma cópia profunda para processamento
+    // --- PROCESSAMENTO INICIAL DOS DADOS ---
+    const processedData = JSON.parse(JSON.stringify(data));
     processedData.districtTableData = processedData.districtTableData.map(d => {
         const growth = d.pop2022 - d.pop2010;
         const growthPct = d.pop2010 === 0 ? 0 : (growth / d.pop2010) * 100;
@@ -98,23 +98,27 @@ document.addEventListener("DOMContentLoaded", function() {
         const selectedUbsText = selectedUbsKey ? ubsFilter.options[ubsFilter.selectedIndex].text : null;
         const normalizeString = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase() : "";
         
-        // 1. PREPARAR DADOS PARA TABELAS
         const tableData = {
             districtTableData: processedData.districtTableData,
             ubsTableData: selectedUbsKey ? processedData.ubsTableData.filter(u => normalizeString(u.ubs) === normalizeString(selectedUbsKey)) : processedData.ubsTableData
         };
 
-        // 2. PREPARAR DADOS PARA OS GRÁFICOS
         const chartData = {};
         chartData.ageGroupData = {
             labels: processedData.ageGroupData.labels,
             datasets: selectedUbsKey ? processedData.ageGroupData.datasets.filter(d => normalizeString(d.label) === normalizeString(selectedUbsKey)) : processedData.ageGroupData.datasets
         };
+        
+        // **** CORREÇÃO ESPECÍFICA PARA O GRÁFICO DE PIZZA ****
         if (selectedUbsKey) {
             const ubsVulnerability = processedData.vulnerabilityData.datasets.find(d => normalizeString(d.ubs) === normalizeString(selectedUbsKey));
             chartData.vulnerabilityData = {
-                labels: processedData.vulnerabilityData.levels,
-                datasets: [{ data: ubsVulnerability ? ubsVulnerability.data : [0,0,0,0], backgroundColor: processedData.vulnerabilityData.colors }]
+                labels: processedData.vulnerabilityData.levels, // Labels para cada fatia
+                datasets: [{
+                    label: 'Vulnerabilidade', // Label para o conjunto de dados
+                    data: ubsVulnerability ? ubsVulnerability.data : [0,0,0,0],
+                    backgroundColor: processedData.vulnerabilityData.colors
+                }]
             };
         } else {
             chartData.vulnerabilityData = {
@@ -127,13 +131,11 @@ document.addEventListener("DOMContentLoaded", function() {
         chartData.ubsPopulationData = processedData.ubsPopulationData;
         chartData.historicalData = processedData.historicalData;
 
-        // 3. PREPARAR DADOS PARA OS CARDS DE ESTATÍSTICAS
         const statsData = {
             totalUBS: tableData.ubsTableData.length,
             eldoradoPopulation: selectedUbsKey ? tableData.ubsTableData.reduce((sum, ubs) => sum + ubs.population, 0).toLocaleString("pt-BR") : processedData.eldoradoPopulation
         };
 
-        // 4. RENDERIZAR TUDO
         renderStats(statsData);
         renderTables(tableData);
         renderCharts(chartData, selectedUbsKey, selectedUbsText);
@@ -162,7 +164,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function renderCharts(chartData, selectedUbsKey, selectedUbsText) {
-        Object.values(charts).forEach(chart => chart.destroy()); // Destroi todos os gráficos existentes
+        Object.values(charts).forEach(chart => chart.destroy());
 
         charts.ageGroup = new Chart(document.getElementById("ageGroupChart").getContext("2d"), { type: "bar", data: chartData.ageGroupData, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: false } } } });
         charts.ubsPopulation = new Chart(document.getElementById("ubsChart").getContext("2d"), { type: "bar", data: chartData.ubsPopulationData, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
