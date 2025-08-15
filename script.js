@@ -15,15 +15,15 @@ document.addEventListener("DOMContentLoaded", function() {
         ageGroupData: {
             labels: ["0-4 anos", "5-11 anos", "12-17 anos", "18-29 anos", "30-59 anos", "60+ anos"],
             datasets: [
-                { label: "UBS Água Branca", data: [1200, 1500, 1800, 2000, 2500, 1000], backgroundColor: "#FF6384" },
-                { label: "UBS Bela Vista", data: [1000, 1200, 1500, 1800, 2200, 900], backgroundColor: "#36A2EB" },
+                { label: "Água Branca", data: [1200, 1500, 1800, 2000, 2500, 1000], backgroundColor: "#FF6384" },
+                { label: "Bela Vista", data: [1000, 1200, 1500, 1800, 2200, 900], backgroundColor: "#36A2EB" },
                 { label: "CSU Eldorado", data: [2000, 2500, 3000, 3500, 4000, 1500], backgroundColor: "#FFCE56" },
-                { label: "UBS Jardim Bandeirantes", data: [900, 1100, 1300, 1500, 1800, 700], backgroundColor: "#4BC0C0" },
-                { label: "UBS Jardim Eldorado", data: [1500, 1800, 2200, 2500, 3000, 1200], backgroundColor: "#9966FF" },
-                { label: "UBS Novo Eldorado", data: [1600, 2000, 2400, 2800, 3200, 1300], backgroundColor: "#FF9F40" },
-                { label: "UBS Parque São João", data: [1100, 1400, 1700, 1900, 2300, 950], backgroundColor: "#5A5A5A" },
-                { label: "UBS Perobas", data: [800, 1000, 1200, 1400, 1700, 600], backgroundColor: "#C7C7C7" },
-                { label: "UBS Santa Cruz", data: [1300, 1600, 1900, 2100, 2600, 1100], backgroundColor: "#8B4513" },
+                { label: "Jardim Bandeirantes", data: [900, 1100, 1300, 1500, 1800, 700], backgroundColor: "#4BC0C0" },
+                { label: "Jardim Eldorado", data: [1500, 1800, 2200, 2500, 3000, 1200], backgroundColor: "#9966FF" },
+                { label: "Novo Eldorado", data: [1600, 2000, 2400, 2800, 3200, 1300], backgroundColor: "#FF9F40" },
+                { label: "Parque São João", data: [1100, 1400, 1700, 1900, 2300, 950], backgroundColor: "#5A5A5A" },
+                { label: "Perobas", data: [800, 1000, 1200, 1400, 1700, 600], backgroundColor: "#C7C7C7" },
+                { label: "Santa Cruz", data: [1300, 1600, 1900, 2100, 2600, 1100], backgroundColor: "#8B4513" },
                 { label: "Unidade XV", data: [1400, 1700, 2000, 2300, 2800, 1150], backgroundColor: "#20B2AA" }
             ]
         },
