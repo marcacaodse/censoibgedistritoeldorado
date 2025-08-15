@@ -7,14 +7,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const ubsTableBody = document.querySelector("#ubsTable tbody");
 
     // ===================================================================================
-    // FONTE DE DADOS PRINCIPAL (CORRIGIDA E COMPLETA)
+    // FONTE DE DADOS PRINCIPAL (NÃO SERÁ MODIFICADA)
     // ===================================================================================
     const data = {
         totalPopulation: "621.863",
         totalUBS: "10",
         totalDistricts: "8",
         eldoradoPopulation: "101.378",
-        
         ageGroupData: {
             labels: ["0 a 4 anos", "5 a 11 anos", "12 a 17 anos", "18 a 29 anos", "30 a 59 anos", "60 anos ou mais"],
             datasets: [
@@ -30,12 +29,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 { label: "Unidade XV", data: [1211, 1693, 1256, 5031, 10837, 2098], backgroundColor: "#20B2AA" }
             ]
         },
-        
         vulnerabilityData: {
             labels: ["Água Branca", "Bela Vista", "CSU Eldorado", "Jardim Bandeirantes", "Jardim Eldorado", "Novo Eldorado", "Parque São João", "Perobas", "Santa Cruz", "Unidade XV"],
             levels: ["Baixa", "Média", "Elevada", "Muito Elevada"],
             colors: ["#27ae60", "#f39c12", "#e74c3c", "#8e44ad"],
-            // Ordem dos dados: [Baixa, Média, Elevada, Muito Elevada]
             datasets: [
                 { ubs: "Água Branca", data: [2112, 7597, 1314, 565] },
                 { ubs: "Bela Vista", data: [815, 1540, 1985, 0] },
@@ -49,7 +46,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 { ubs: "Unidade XV", data: [19008, 5451, 0, 0] }
             ]
         },
-        
         districtTableData: [
             { district: "Ressaca", pop2010: 95263, pop2022: 105524 },
             { district: "Sede", pop2010: 90328, pop2022: 102060 },
@@ -60,7 +56,6 @@ document.addEventListener("DOMContentLoaded", function() {
             { district: "Vargem das Flores", pop2010: 49945, pop2022: 54748 },
             { district: "Petrolândia", pop2010: 41927, pop2022: 50344 }
         ],
-
         ubsTableData: [
             { ubs: "Água Branca", population: 8456, vulnerability: "Média", ageGroup: "30-59 anos", status: "Ativa" },
             { ubs: "Bela Vista", population: 9234, vulnerability: "Baixa", ageGroup: "18-29 anos", status: "Ativa" },
@@ -75,74 +70,80 @@ document.addEventListener("DOMContentLoaded", function() {
         ]
     };
 
-    // --- PROCESSAMENTO INICIAL DOS DADOS ---
-    // Calcula crescimento dos distritos
-    data.districtTableData = data.districtTableData.map(d => {
+    // --- PROCESSAMENTO INICIAL DOS DADOS (executado apenas uma vez) ---
+    const processedData = JSON.parse(JSON.stringify(data)); // Cria uma cópia profunda para processamento
+    processedData.districtTableData = processedData.districtTableData.map(d => {
         const growth = d.pop2022 - d.pop2010;
         const growthPct = d.pop2010 === 0 ? 0 : (growth / d.pop2010) * 100;
         return { ...d, growth: growth.toLocaleString('pt-BR', { signDisplay: 'always' }), growthPct: `${growth > 0 ? '+' : ''}${growthPct.toFixed(1)}%` };
     });
-
-    // Prepara dados para o gráfico histórico
-    data.historicalData = {
-        labels: data.districtTableData.map(d => d.district),
+    processedData.historicalData = {
+        labels: processedData.districtTableData.map(d => d.district),
         datasets: [
-            { label: "População 2010", data: data.districtTableData.map(d => d.pop2010), backgroundColor: "#2c3e50" },
-            { label: "População 2022", data: data.districtTableData.map(d => d.pop2022), backgroundColor: "#3498db" }
+            { label: "População 2010", data: processedData.districtTableData.map(d => d.pop2010), backgroundColor: "#2c3e50" },
+            { label: "População 2022", data: processedData.districtTableData.map(d => d.pop2022), backgroundColor: "#3498db" }
         ]
     };
-
-    // Prepara dados para o gráfico de população por UBS
-    data.ubsPopulationData = {
-        labels: data.ubsTableData.map(d => d.ubs),
-        datasets: [
-            { label: "População Cadastrada", data: data.ubsTableData.map(d => d.population), backgroundColor: "#3498db" }
-        ]
+    processedData.ubsPopulationData = {
+        labels: processedData.ubsTableData.map(d => d.ubs),
+        datasets: [{ label: "População Cadastrada", data: processedData.ubsTableData.map(d => d.population), backgroundColor: "#3498db" }]
     };
 
     // --- VARIÁVEIS GLOBAIS PARA OS GRÁFICOS ---
-    let ageGroupChart, vulnerabilityChart, ubsChart, historicalChart;
+    let charts = {};
 
     // --- FUNÇÕES DE RENDERIZAÇÃO ---
-    function updateStats(filteredData) {
-        document.getElementById("totalPopulation").textContent = data.totalPopulation;
-        document.getElementById("totalUBS").textContent = filteredData.totalUBS;
-        document.getElementById("totalDistricts").textContent = data.totalDistricts;
-        document.getElementById("eldoradoPopulation").textContent = filteredData.eldoradoPopulation;
+    function renderDashboard() {
+        const selectedUbsKey = ubsFilter.value;
+        const selectedUbsText = selectedUbsKey ? ubsFilter.options[ubsFilter.selectedIndex].text : null;
+        const normalizeString = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase() : "";
+        
+        // 1. PREPARAR DADOS PARA TABELAS
+        const tableData = {
+            districtTableData: processedData.districtTableData,
+            ubsTableData: selectedUbsKey ? processedData.ubsTableData.filter(u => normalizeString(u.ubs) === normalizeString(selectedUbsKey)) : processedData.ubsTableData
+        };
+
+        // 2. PREPARAR DADOS PARA OS GRÁFICOS
+        const chartData = {};
+        chartData.ageGroupData = {
+            labels: processedData.ageGroupData.labels,
+            datasets: selectedUbsKey ? processedData.ageGroupData.datasets.filter(d => normalizeString(d.label) === normalizeString(selectedUbsKey)) : processedData.ageGroupData.datasets
+        };
+        if (selectedUbsKey) {
+            const ubsVulnerability = processedData.vulnerabilityData.datasets.find(d => normalizeString(d.ubs) === normalizeString(selectedUbsKey));
+            chartData.vulnerabilityData = {
+                labels: processedData.vulnerabilityData.levels,
+                datasets: [{ data: ubsVulnerability ? ubsVulnerability.data : [0,0,0,0], backgroundColor: processedData.vulnerabilityData.colors }]
+            };
+        } else {
+            chartData.vulnerabilityData = {
+                labels: processedData.vulnerabilityData.labels,
+                datasets: processedData.vulnerabilityData.levels.map((level, i) => ({
+                    label: level, data: processedData.vulnerabilityData.datasets.map(d => d.data[i]), backgroundColor: processedData.vulnerabilityData.colors[i]
+                }))
+            };
+        }
+        chartData.ubsPopulationData = processedData.ubsPopulationData;
+        chartData.historicalData = processedData.historicalData;
+
+        // 3. PREPARAR DADOS PARA OS CARDS DE ESTATÍSTICAS
+        const statsData = {
+            totalUBS: tableData.ubsTableData.length,
+            eldoradoPopulation: selectedUbsKey ? tableData.ubsTableData.reduce((sum, ubs) => sum + ubs.population, 0).toLocaleString("pt-BR") : processedData.eldoradoPopulation
+        };
+
+        // 4. RENDERIZAR TUDO
+        renderStats(statsData);
+        renderTables(tableData);
+        renderCharts(chartData, selectedUbsKey, selectedUbsText);
     }
 
-    function renderCharts(chartData, selectedUbsValue) {
-        if (ageGroupChart) ageGroupChart.destroy();
-        if (vulnerabilityChart) vulnerabilityChart.destroy();
-        if (ubsChart) ubsChart.destroy();
-        if (historicalChart) historicalChart.destroy();
-
-        // Gráfico de Faixa Etária
-        const ageGroupCtx = document.getElementById("ageGroupChart").getContext("2d");
-        ageGroupChart = new Chart(ageGroupCtx, { type: "bar", data: chartData.ageGroupData, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: false } } } });
-        updateCustomLegend('ageGroupLegend', ageGroupChart);
-
-        // Gráfico de Vulnerabilidade (Lógica de Pizza/Barra)
-        const vulnerabilityCtx = document.getElementById("vulnerabilityChart").getContext("2d");
-        const vulnerabilityChartTitle = document.querySelector("#vulnerabilityChart").parentElement.querySelector(".chart-title");
-        if (selectedUbsValue) {
-            vulnerabilityChartTitle.textContent = `Vulnerabilidade - ${selectedUbsValue}`;
-            vulnerabilityChart = new Chart(vulnerabilityCtx, { type: 'pie', data: chartData.vulnerabilityData, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
-        } else {
-            vulnerabilityChartTitle.textContent = 'Vulnerabilidade por Unidade';
-            vulnerabilityChart = new Chart(vulnerabilityCtx, { type: 'bar', data: chartData.vulnerabilityData, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: false } } } });
-        }
-        updateCustomLegend('vulnerabilityLegend', vulnerabilityChart);
-
-        // Gráfico de População por UBS
-        const ubsCtx = document.getElementById("ubsChart").getContext("2d");
-        ubsChart = new Chart(ubsCtx, { type: "bar", data: chartData.ubsPopulationData, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
-        updateCustomLegend('ubsLegend', ubsChart);
-
-        // Gráfico Histórico de Distritos
-        const historicalCtx = document.getElementById("historicalChart").getContext("2d");
-        historicalChart = new Chart(historicalCtx, { type: "bar", data: chartData.historicalData, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
-        updateCustomLegend('historicalLegend', historicalChart);
+    function renderStats(statsData) {
+        document.getElementById("totalPopulation").textContent = processedData.totalPopulation;
+        document.getElementById("totalUBS").textContent = statsData.totalUBS;
+        document.getElementById("totalDistricts").textContent = processedData.totalDistricts;
+        document.getElementById("eldoradoPopulation").textContent = statsData.eldoradoPopulation;
     }
 
     function renderTables(tableData) {
@@ -152,7 +153,6 @@ document.addEventListener("DOMContentLoaded", function() {
             tr.innerHTML = `<td>${row.district}</td><td>${row.pop2010.toLocaleString("pt-BR")}</td><td>${row.pop2022.toLocaleString("pt-BR")}</td><td class="${row.growth.startsWith('+') ? "growth-positive" : "growth-negative"}">${row.growth}</td><td class="${row.growthPct.startsWith('+') ? "growth-positive" : "growth-negative"}">${row.growthPct}</td>`;
             districtTableBody.appendChild(tr);
         });
-
         ubsTableBody.innerHTML = "";
         tableData.ubsTableData.forEach(row => {
             const tr = document.createElement("tr");
@@ -161,8 +161,29 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    function renderCharts(chartData, selectedUbsKey, selectedUbsText) {
+        Object.values(charts).forEach(chart => chart.destroy()); // Destroi todos os gráficos existentes
+
+        charts.ageGroup = new Chart(document.getElementById("ageGroupChart").getContext("2d"), { type: "bar", data: chartData.ageGroupData, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: false } } } });
+        charts.ubsPopulation = new Chart(document.getElementById("ubsChart").getContext("2d"), { type: "bar", data: chartData.ubsPopulationData, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+        charts.historical = new Chart(document.getElementById("historicalChart").getContext("2d"), { type: "bar", data: chartData.historicalData, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+
+        const vulnerabilityCtx = document.getElementById("vulnerabilityChart").getContext("2d");
+        const vulnerabilityChartTitle = vulnerabilityCtx.closest('.chart-container').querySelector(".chart-title");
+        if (selectedUbsKey) {
+            vulnerabilityChartTitle.textContent = `Vulnerabilidade - ${selectedUbsText}`;
+            charts.vulnerability = new Chart(vulnerabilityCtx, { type: 'pie', data: chartData.vulnerabilityData, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+        } else {
+            vulnerabilityChartTitle.textContent = 'Vulnerabilidade por Unidade';
+            charts.vulnerability = new Chart(vulnerabilityCtx, { type: 'bar', data: chartData.vulnerabilityData, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: false } } } });
+        }
+        
+        Object.keys(charts).forEach(key => updateCustomLegend(`${key}Legend`, charts[key]));
+    }
+
     function updateCustomLegend(legendId, chart) {
         const legendContainer = document.getElementById(legendId);
+        if (!legendContainer) return;
         legendContainer.innerHTML = "";
         const legendItems = chart.options.plugins.legend.labels.generateLabels(chart);
         legendItems.forEach(item => {
@@ -179,67 +200,18 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // --- FUNÇÃO PRINCIPAL DE FILTROS ---
-    function applyFilters() {
-        const selectedUbsKey = ubsFilter.value;
-        const selectedUbsText = ubsFilter.options[ubsFilter.selectedIndex].text;
-        const normalizeString = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase() : "";
-        
-        let filteredChartData = {};
-        let filteredTableData = {};
-        let filteredStatsData = {};
-
-        // Filtra os dados para as tabelas
-        filteredTableData.districtTableData = data.districtTableData;
-        filteredTableData.ubsTableData = selectedUbsKey ? data.ubsTableData.filter(u => normalizeString(u.ubs) === normalizeString(selectedUbsKey)) : data.ubsTableData;
-
-        // Filtra os dados para os gráficos
-        filteredChartData.ageGroupData = {
-            labels: data.ageGroupData.labels,
-            datasets: selectedUbsKey ? data.ageGroupData.datasets.filter(d => normalizeString(d.label) === normalizeString(selectedUbsKey)) : data.ageGroupData.datasets
-        };
-        
-        if (selectedUbsKey) {
-            const singleUbsVulnerability = data.vulnerabilityData.datasets.find(d => normalizeString(d.ubs) === normalizeString(selectedUbsKey));
-            filteredChartData.vulnerabilityData = {
-                labels: data.vulnerabilityData.levels,
-                datasets: [{ data: singleUbsVulnerability ? singleUbsVulnerability.data : [0,0,0,0], backgroundColor: data.vulnerabilityData.colors }]
-            };
-        } else {
-            filteredChartData.vulnerabilityData = {
-                labels: data.vulnerabilityData.labels,
-                datasets: data.vulnerabilityData.levels.map((level, i) => ({
-                    label: level, data: data.vulnerabilityData.datasets.map(d => d.data[i]), backgroundColor: data.vulnerabilityData.colors[i]
-                }))
-            };
-        }
-        filteredChartData.ubsPopulationData = data.ubsPopulationData;
-        filteredChartData.historicalData = data.historicalData;
-
-        // Filtra os dados para os cartões de estatísticas
-        filteredStatsData.totalUBS = filteredTableData.ubsTableData.length;
-        filteredStatsData.eldoradoPopulation = selectedUbsKey 
-            ? filteredTableData.ubsTableData.reduce((sum, ubs) => sum + ubs.population, 0).toLocaleString("pt-BR")
-            : data.eldoradoPopulation;
-
-        // Renderiza tudo
-        updateStats(filteredStatsData);
-        renderTables(filteredTableData);
-        renderCharts(filteredChartData, selectedUbsKey ? selectedUbsText : null);
-    }
-
     // --- EVENT LISTENERS ---
     window.clearFilters = function() {
         ubsFilter.value = "";
         vulnerabilityFilter.value = "";
         ageGroupFilter.value = "";
-        applyFilters();
+        renderDashboard();
     };
     window.downloadExcel = function() { alert("Funcionalidade de download de Excel ainda não implementada."); };
-    ubsFilter.addEventListener("change", applyFilters);
-    vulnerabilityFilter.addEventListener("change", applyFilters);
-    ageGroupFilter.addEventListener("change", applyFilters);
+    [ubsFilter, vulnerabilityFilter, ageGroupFilter].forEach(filter => {
+        filter.addEventListener("change", renderDashboard);
+    });
 
     // --- INICIALIZAÇÃO ---
-    applyFilters();
+    renderDashboard();
 });
