@@ -2,16 +2,17 @@ document.addEventListener("DOMContentLoaded", function() {
     const ubsFilter = document.getElementById("ubsFilter");
     const vulnerabilityFilter = document.getElementById("vulnerabilityFilter");
     const ageGroupFilter = document.getElementById("ageGroupFilter");
-    const statsGrid = document.getElementById("statsGrid");
     const districtTableBody = document.querySelector("#districtTable tbody");
     const ubsTableBody = document.querySelector("#ubsTable tbody");
 
-    // Dados de exemplo (substitua por seus dados reais)
+    // ===================================================================================
+    // DADOS ATUALIZADOS AQUI
+    // ===================================================================================
     const data = {
-        totalPopulation: "621,863",
+        totalPopulation: "621.863", // População total correta
         totalUBS: "10",
         totalDistricts: "8",
-        eldoradoPopulation: "101,378",
+        eldoradoPopulation: "101.378", // População do distrito Eldorado
         ageGroupData: {
             labels: ["0-4 anos", "5-11 anos", "12-17 anos", "18-29 anos", "30-59 anos", "60+ anos"],
             datasets: [
@@ -38,43 +39,77 @@ document.addEventListener("DOMContentLoaded", function() {
                 { label: "População 2010", data: [7500, 8000, 13000, 7000, 10000, 11000, 9000, 6000, 9500, 9000], backgroundColor: "#2c3e50" }
             ]
         },
-        historicalData: {
-            labels: ["Eldorado", "Centro", "Industrial", "Ressaca", "Riacho", "Sede", "Vargem das Flores", "Petrolândia"],
-            datasets: [
-                { label: "População 2010", data: [89341, 98765, 76543, 65432, 54321, 87654, 43210, 32109], backgroundColor: "#2c3e50" },
-                { label: "População 2022", data: [101378, 112456, 87234, 73891, 61234, 98765, 48567, 38338], backgroundColor: "#3498db" }
-            ]
-        },
+        // DADOS CORRIGIDOS PARA OS DISTRITOS
         districtTableData: [
-            { district: "Eldorado", pop2010: 89341, pop2022: 101378, growth: "+12,037", growthPct: "+13.5%" },
-            { district: "Centro", pop2010: 98765, pop2022: 112456, growth: "+13,691", growthPct: "+13.9%" },
-            { district: "Industrial", pop2010: 76543, pop2022: 87234, growth: "+10,691", growthPct: "+14.0%" },
-            { district: "Ressaca", pop2010: 65432, pop2022: 73891, growth: "+8,459", growthPct: "+12.9%" },
-            { district: "Riacho", pop2010: 54321, pop2022: 61234, growth: "+6,913", growthPct: "+12.7%" },
-            { district: "Sede", pop2010: 87654, pop2022: 98765, growth: "+11,111", growthPct: "+12.7%" },
-            { district: "Vargem das Flores", pop2010: 43210, pop2022: 48567, growth: "+5,357", growthPct: "+12.4%" },
-            { district: "Petrolândia", pop2010: 32109, pop2022: 38338, growth: "+6,229", growthPct: "+19.4%" }
-        ],
-        ubsTableData: [
-            { ubs: "Água Branca", population: 8456, vulnerability: "Média", ageGroup: "30-59 anos", status: "Ativa" },
-            { ubs: "Bela Vista", population: 9234, vulnerability: "Baixa", ageGroup: "18-29 anos", status: "Ativa" },
-            { ubs: "Eldorado", population: 15678, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" },
-            { ubs: "Jardim Bandeirantes", population: 7891, vulnerability: "Média", ageGroup: "5-11 anos", status: "Ativa" },
-            { ubs: "Jardim Eldorado", population: 11234, vulnerability: "Baixa", ageGroup: "30-59 anos", status: "Ativa" },
-            { ubs: "Novo Eldorado", population: 12567, vulnerability: "Elevada", ageGroup: "18-29 anos", status: "Ativa" },
-            { ubs: "Parque São João", population: 9876, vulnerability: "Muito Elevada", ageGroup: "0-4 anos", status: "Ativa" },
-            { ubs: "Perobas", population: 6543, vulnerability: "Média", ageGroup: "60+ anos", status: "Ativa" },
-            { ubs: "Santa Cruz", population: 10123, vulnerability: "Baixa", ageGroup: "12-17 anos", status: "Ativa" },
-            { ubs: "Unidade XV", population: 9776, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" }
+            { district: "Ressaca", pop2010: 95263, pop2022: 105524 },
+            { district: "Sede", pop2010: 90328, pop2022: 102060 },
+            { district: "Eldorado", pop2010: 116878, pop2022: 101378 },
+            { district: "Nacional", pop2010: 61216, pop2022: 72716 },
+            { district: "Industrial", pop2010: 74553, pop2022: 69412 },
+            { district: "Riacho", pop2010: 73041, pop2022: 65681 },
+            { district: "Vargem das Flores", pop2010: 49945, pop2022: 54748 },
+            { district: "Petrolândia", pop2010: 41927, pop2022: 50344 }
         ]
     };
+    // ===================================================================================
+    // FIM DOS DADOS ATUALIZADOS
+    // ===================================================================================
+
+
+    // Função para calcular crescimento e porcentagem dinamicamente
+    function processDistrictData(districtData) {
+        return districtData.map(d => {
+            const growth = d.pop2022 - d.pop2010;
+            const growthPct = d.pop2010 === 0 ? 0 : (growth / d.pop2010) * 100;
+            return {
+                ...d,
+                growth: growth.toLocaleString('pt-BR', { signDisplay: 'always' }),
+                growthPct: `${growth > 0 ? '+' : ''}${growthPct.toFixed(1)}%`
+            };
+        });
+    }
+
+    // Processa os dados dos distritos para incluir crescimento
+    data.districtTableData = processDistrictData(data.districtTableData);
+
+    // Prepara os dados para o gráfico histórico com os valores corretos
+    data.historicalData = {
+        labels: data.districtTableData.map(d => d.district),
+        datasets: [
+            {
+                label: "População 2010",
+                data: data.districtTableData.map(d => d.pop2010),
+                backgroundColor: "#2c3e50"
+            },
+            {
+                label: "População 2022",
+                data: data.districtTableData.map(d => d.pop2022),
+                backgroundColor: "#3498db"
+            }
+        ]
+    };
+    
+    // Dados da tabela de UBS (mantidos como no exemplo anterior)
+    data.ubsTableData = [
+        { ubs: "Água Branca", population: 8456, vulnerability: "Média", ageGroup: "30-59 anos", status: "Ativa" },
+        { ubs: "Bela Vista", population: 9234, vulnerability: "Baixa", ageGroup: "18-29 anos", status: "Ativa" },
+        { ubs: "Eldorado", population: 15678, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" },
+        { ubs: "Jardim Bandeirantes", population: 7891, vulnerability: "Média", ageGroup: "5-11 anos", status: "Ativa" },
+        { ubs: "Jardim Eldorado", population: 11234, vulnerability: "Baixa", ageGroup: "30-59 anos", status: "Ativa" },
+        { ubs: "Novo Eldorado", population: 12567, vulnerability: "Elevada", ageGroup: "18-29 anos", status: "Ativa" },
+        { ubs: "Parque São João", population: 9876, vulnerability: "Muito Elevada", ageGroup: "0-4 anos", status: "Ativa" },
+        { ubs: "Perobas", population: 6543, vulnerability: "Média", ageGroup: "60+ anos", status: "Ativa" },
+        { ubs: "Santa Cruz", population: 10123, vulnerability: "Baixa", ageGroup: "12-17 anos", status: "Ativa" },
+        { ubs: "Unidade XV", population: 9776, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" }
+    ];
+
 
     let ageGroupChart, vulnerabilityChart, ubsChart, historicalChart;
 
     function updateStats(filteredData) {
-        document.getElementById("totalPopulation").textContent = data.totalPopulation; // População total não muda com filtros
+        document.getElementById("totalPopulation").textContent = data.totalPopulation;
         document.getElementById("totalUBS").textContent = filteredData.totalUBS;
-        document.getElementById("totalDistricts").textContent = data.totalDistricts; // Distritos não mudam com filtros
+        document.getElementById("totalDistricts").textContent = data.totalDistricts;
         document.getElementById("eldoradoPopulation").textContent = filteredData.eldoradoPopulation;
     }
 
@@ -121,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function() {
         districtTableBody.innerHTML = "";
         filteredData.districtTableData.forEach(row => {
             const tr = document.createElement("tr");
-            tr.innerHTML = `<td>${row.district}</td><td>${row.pop2010.toLocaleString("pt-BR")}</td><td>${row.pop2022.toLocaleString("pt-BR")}</td><td class="${row.growth.startsWith("+") ? "growth-positive" : "growth-negative"}">${row.growth}</td><td class="${row.growthPct.startsWith("+") ? "growth-positive" : "growth-negative"}">${row.growthPct}</td>`;
+            tr.innerHTML = `<td>${row.district}</td><td>${row.pop2010.toLocaleString("pt-BR")}</td><td>${row.pop2022.toLocaleString("pt-BR")}</td><td class="${row.growth.startsWith('+') ? "growth-positive" : "growth-negative"}">${row.growth}</td><td class="${row.growthPct.startsWith('+') ? "growth-positive" : "growth-negative"}">${row.growthPct}</td>`;
             districtTableBody.appendChild(tr);
         });
 
@@ -136,33 +171,26 @@ document.addEventListener("DOMContentLoaded", function() {
     function updateCustomLegend(legendId, chart) {
         const legendContainer = document.getElementById(legendId);
         legendContainer.innerHTML = "";
-
         const legendItems = chart.options.plugins.legend.labels.generateLabels(chart);
-
         legendItems.forEach(item => {
             const legendItemDiv = document.createElement("div");
             legendItemDiv.className = "legend-item";
             legendItemDiv.style.opacity = item.hidden ? 0.5 : 1;
             legendItemDiv.innerHTML = `<span class="legend-color" style="background-color: ${item.fillStyle}"></span> ${item.text}`;
-            
             legendItemDiv.onclick = () => {
                 chart.toggleDataVisibility(item.index);
                 chart.update();
             };
-            
             legendContainer.appendChild(legendItemDiv);
         });
     }
 
-    // *** FUNÇÃO DE FILTRO CORRIGIDA ***
     function applyFilters() {
         let filteredData = JSON.parse(JSON.stringify(data));
-
         const selectedUbsValue = ubsFilter.value;
         const selectedVulnerability = vulnerabilityFilter.value;
         const selectedAgeGroup = ageGroupFilter.value;
 
-        // Função auxiliar para normalizar strings (remove acentos, espaços, etc.)
         const normalizeString = (str) => {
             if (!str) return "";
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
@@ -170,17 +198,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const normalizedSelectedUbs = normalizeString(selectedUbsValue);
 
-        // 1. Filtrar a tabela de UBS
         if (selectedUbsValue) {
             filteredData.ubsTableData = data.ubsTableData.filter(ubs => normalizeString(ubs.ubs) === normalizedSelectedUbs);
-        }
-
-        // 2. Filtrar o gráfico de faixa etária por UBS
-        if (selectedUbsValue) {
             filteredData.ageGroupData.datasets = data.ageGroupData.datasets.filter(dataset => normalizeString(dataset.label) === normalizedSelectedUbs);
         }
-        
-        // 3. Atualizar os totais com base nos filtros
+
         if (selectedUbsValue) {
             if (filteredData.ubsTableData.length > 0) {
                 filteredData.eldoradoPopulation = filteredData.ubsTableData.reduce((sum, ubs) => sum + ubs.population, 0).toLocaleString("pt-BR");
@@ -190,13 +212,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 filteredData.totalUBS = "0";
             }
         } else {
-            // Se nenhuma UBS estiver selecionada, mostrar totais gerais
             filteredData.eldoradoPopulation = data.eldoradoPopulation;
             filteredData.totalUBS = data.totalUBS;
         }
 
-        // Lógica para filtros de vulnerabilidade e faixa etária (aplicada após o filtro de UBS)
-        // Esta parte do código original estava funcional e foi mantida com pequenas melhorias.
         if (selectedVulnerability) {
             const vulnerabilityIndex = data.vulnerabilityData.labels.findIndex(label => label.toUpperCase() === selectedVulnerability);
             if (vulnerabilityIndex !== -1) {
@@ -237,6 +256,5 @@ document.addEventListener("DOMContentLoaded", function() {
     vulnerabilityFilter.addEventListener("change", applyFilters);
     ageGroupFilter.addEventListener("change", applyFilters);
 
-    // Inicializar o dashboard
     applyFilters();
 });
