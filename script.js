@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
             datasets: [{ data: [30, 40, 20, 10], backgroundColor: ["#27ae60", "#f39c12", "#3498db", "#e74c3c"] }]
         },
         ubsPopulationData: {
-            labels: ["UBS Água Branca", "UBS Bela Vista", "CSU Eldorado", "UBS Jardim Bandeirantes", "UBS Jardim Eldorado", "UBS Novo Eldorado", "UBS Parque São João", "UBS Perobas", "UBS Santa Cruz", "Unidade XV"],
+            labels: ["Água Branca", "Bela Vista", "CSU Eldorado", "Jardim Bandeirantes", "Jardim Eldorado", "Novo Eldorado", "Parque São João", "Perobas", "Santa Cruz", "Unidade XV"],
             datasets: [
                 { label: "População 2022", data: [8456, 9234, 15678, 7891, 11234, 12567, 9876, 6543, 10123, 9776], backgroundColor: "#3498db" },
                 { label: "População 2010", data: [7500, 8000, 13000, 7000, 10000, 11000, 9000, 6000, 9500, 9000], backgroundColor: "#2c3e50" }
@@ -56,15 +56,15 @@ document.addEventListener("DOMContentLoaded", function() {
             { district: "Petrolândia", pop2010: 32109, pop2022: 38338, growth: "+6,229", growthPct: "+19.4%" }
         ],
         ubsTableData: [
-            { ubs: "UBS Água Branca", population: 8456, vulnerability: "Média", ageGroup: "30-59 anos", status: "Ativa" },
-            { ubs: "UBS Bela Vista", population: 9234, vulnerability: "Baixa", ageGroup: "18-29 anos", status: "Ativa" },
-            { ubs: "CSU Eldorado", population: 15678, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" },
-            { ubs: "UBS Jardim Bandeirantes", population: 7891, vulnerability: "Média", ageGroup: "5-11 anos", status: "Ativa" },
-            { ubs: "UBS Jardim Eldorado", population: 11234, vulnerability: "Baixa", ageGroup: "30-59 anos", status: "Ativa" },
-            { ubs: "UBS Novo Eldorado", population: 12567, vulnerability: "Elevada", ageGroup: "18-29 anos", status: "Ativa" },
-            { ubs: "UBS Parque São João", population: 9876, vulnerability: "Muito Elevada", ageGroup: "0-4 anos", status: "Ativa" },
-            { ubs: "UBS Perobas", population: 6543, vulnerability: "Média", ageGroup: "60+ anos", status: "Ativa" },
-            { ubs: "UBS Santa Cruz", population: 10123, vulnerability: "Baixa", ageGroup: "12-17 anos", status: "Ativa" },
+            { ubs: "Água Branca", population: 8456, vulnerability: "Média", ageGroup: "30-59 anos", status: "Ativa" },
+            { ubs: "Bela Vista", population: 9234, vulnerability: "Baixa", ageGroup: "18-29 anos", status: "Ativa" },
+            { ubs: "Eldorado", population: 15678, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" },
+            { ubs: "Jardim Bandeirantes", population: 7891, vulnerability: "Média", ageGroup: "5-11 anos", status: "Ativa" },
+            { ubs: "Jardim Eldorado", population: 11234, vulnerability: "Baixa", ageGroup: "30-59 anos", status: "Ativa" },
+            { ubs: "Novo Eldorado", population: 12567, vulnerability: "Elevada", ageGroup: "18-29 anos", status: "Ativa" },
+            { ubs: "Parque São João", population: 9876, vulnerability: "Muito Elevada", ageGroup: "0-4 anos", status: "Ativa" },
+            { ubs: "Perobas", population: 6543, vulnerability: "Média", ageGroup: "60+ anos", status: "Ativa" },
+            { ubs: "Santa Cruz", population: 10123, vulnerability: "Baixa", ageGroup: "12-17 anos", status: "Ativa" },
             { ubs: "Unidade XV", population: 9776, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" }
         ]
     };
