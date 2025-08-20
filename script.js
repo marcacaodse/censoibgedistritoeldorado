@@ -92,31 +92,26 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let charts = {};
 
-    // **** FUNÇÃO PRINCIPAL ATUALIZADA ****
     function renderDashboard() {
         const selectedUbsKey = ubsFilter.value;
         const selectedVulnerability = vulnerabilityFilter.value;
         const selectedAgeGroup = ageGroupFilter.value;
         const normalizeString = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase() : "";
         
-        // 1. FILTRAR DADOS PARA TABELAS
         const tableData = {
             districtTableData: processedData.districtTableData,
             ubsTableData: processedData.ubsTableData.filter(ubs => {
                 if (selectedUbsKey && normalizeString(ubs.ubs) !== normalizeString(selectedUbsKey)) return false;
-                // Adicionar lógicas de filtro de tabela para vulnerabilidade e faixa etária se necessário no futuro
                 return true;
             })
         };
 
-        // 2. FILTRAR DADOS PARA GRÁFICOS
         const chartData = {};
         const ubsLabels = processedData.ubsTableData.map(u => u.ubs);
         const filteredUbsIndices = ubsLabels.map((label, index) => {
             return (!selectedUbsKey || normalizeString(label) === normalizeString(selectedUbsKey)) ? index : -1;
         }).filter(index => index !== -1);
 
-        // Filtro de Faixa Etária
         const ageGroupLabels = processedData.ageGroupData.labels;
         const ageGroupIndex = ageGroupLabels.indexOf(selectedAgeGroup);
         chartData.ageGroupData = {
@@ -128,7 +123,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 }))
         };
         
-        // Filtro de Vulnerabilidade
         const vulnerabilityLevels = processedData.vulnerabilityData.levels;
         const vulnerabilityIndex = vulnerabilityLevels.indexOf(selectedVulnerability);
         chartData.vulnerabilityData = {
@@ -140,7 +134,6 @@ document.addEventListener("DOMContentLoaded", function() {
             })).filter((_, levelIndex) => !selectedVulnerability || levelIndex === vulnerabilityIndex)
         };
 
-        // Outros gráficos
         chartData.ubsPopulationData = {
             labels: ubsLabels.filter((_, index) => filteredUbsIndices.includes(index)),
             datasets: [{
@@ -151,13 +144,11 @@ document.addEventListener("DOMContentLoaded", function() {
         };
         chartData.historicalData = processedData.historicalData;
 
-        // 3. PREPARAR DADOS PARA OS CARDS DE ESTATÍSTICAS
         const statsData = {
             totalUBS: tableData.ubsTableData.length,
             eldoradoPopulation: selectedUbsKey ? tableData.ubsTableData.reduce((sum, ubs) => sum + ubs.population, 0).toLocaleString("pt-BR") : processedData.eldoradoPopulation
         };
 
-        // 4. RENDERIZAR TUDO
         renderStats(statsData);
         renderTables(tableData);
         renderCharts(chartData);
@@ -185,20 +176,41 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // **** FUNÇÃO DE RENDERIZAR GRÁFICOS ATUALIZADA ****
     function renderCharts(chartData) {
         Object.values(charts).forEach(chart => { if(chart) chart.destroy(); });
 
-        const stackedBarOptions = { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: false }, tooltip: { enabled: true }, datalabels: { display: false } } };
+        // Opção para gráficos com números DENTRO das barras (empilhados)
+        const stackedBarOptionsWithLabels = {
+            responsive: true, maintainAspectRatio: false,
+            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true },
+                datalabels: {
+                    color: 'white', // Cor da etiqueta
+                    font: { weight: 'bold' },
+                    formatter: value => value > 0 ? value.toLocaleString('pt-BR') : '', // Mostra o número se for > 0
+                }
+            }
+        };
+
+        // Opção para gráficos com números FORA das barras (simples)
         const barOptionsWithLabels = {
             responsive: true, maintainAspectRatio: false,
             plugins: {
                 legend: { display: false }, tooltip: { enabled: false },
-                datalabels: { anchor: 'end', align: 'top', color: 'black', font: { weight: 'bold' }, formatter: value => value.toLocaleString('pt-BR') }
+                datalabels: {
+                    anchor: 'end', align: 'top', color: 'black', font: { weight: 'bold' },
+                    formatter: value => value.toLocaleString('pt-BR')
+                }
             }
         };
 
-        charts.ageGroup = new Chart(document.getElementById("ageGroupChart").getContext("2d"), { type: "bar", data: chartData.ageGroupData, options: stackedBarOptions });
-        charts.vulnerability = new Chart(document.getElementById("vulnerabilityChart").getContext("2d"), { type: "bar", data: chartData.vulnerabilityData, options: stackedBarOptions });
+        // Aplicando as opções corretas para cada gráfico
+        charts.ageGroup = new Chart(document.getElementById("ageGroupChart").getContext("2d"), { type: "bar", data: chartData.ageGroupData, options: stackedBarOptionsWithLabels });
+        charts.vulnerability = new Chart(document.getElementById("vulnerabilityChart").getContext("2d"), { type: "bar", data: chartData.vulnerabilityData, options: stackedBarOptionsWithLabels });
+        
         charts.ubsPopulation = new Chart(document.getElementById("ubsChart").getContext("2d"), { type: "bar", data: chartData.ubsPopulationData, options: barOptionsWithLabels });
         charts.historical = new Chart(document.getElementById("historicalChart").getContext("2d"), { type: "bar", data: chartData.historicalData, options: barOptionsWithLabels });
         
@@ -233,7 +245,6 @@ document.addEventListener("DOMContentLoaded", function() {
     };
     window.downloadExcel = function() { alert("Funcionalidade de download de Excel ainda não implementada."); };
     
-    // Adiciona o listener para todos os filtros
     [ubsFilter, vulnerabilityFilter, ageGroupFilter].forEach(filter => {
         filter.addEventListener("change", renderDashboard);
     });
