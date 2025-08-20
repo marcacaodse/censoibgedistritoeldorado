@@ -1,10 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
     // --- ELEMENTOS DO DOM ---
     const ubsFilter = document.getElementById("ubsFilter");
+    const vulnerabilityFilter = document.getElementById("vulnerabilityFilter");
+    const ageGroupFilter = document.getElementById("ageGroupFilter");
     const districtTableBody = document.querySelector("#districtTable tbody");
     const ubsTableBody = document.querySelector("#ubsTable tbody");
 
-    // **** CORREÇÃO APLICADA AQUI: REGISTRA O PLUGIN GLOBALMENTE ****
     Chart.register(ChartDataLabels);
 
     // ===================================================================================
@@ -91,47 +92,72 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let charts = {};
 
+    // **** FUNÇÃO PRINCIPAL ATUALIZADA ****
     function renderDashboard() {
         const selectedUbsKey = ubsFilter.value;
+        const selectedVulnerability = vulnerabilityFilter.value;
+        const selectedAgeGroup = ageGroupFilter.value;
         const normalizeString = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase() : "";
         
+        // 1. FILTRAR DADOS PARA TABELAS
         const tableData = {
             districtTableData: processedData.districtTableData,
-            ubsTableData: selectedUbsKey ? processedData.ubsTableData.filter(u => normalizeString(u.ubs) === normalizeString(selectedUbsKey)) : processedData.ubsTableData
+            ubsTableData: processedData.ubsTableData.filter(ubs => {
+                if (selectedUbsKey && normalizeString(ubs.ubs) !== normalizeString(selectedUbsKey)) return false;
+                // Adicionar lógicas de filtro de tabela para vulnerabilidade e faixa etária se necessário no futuro
+                return true;
+            })
         };
 
+        // 2. FILTRAR DADOS PARA GRÁFICOS
         const chartData = {};
         const ubsLabels = processedData.ubsTableData.map(u => u.ubs);
-        const filteredUbsIndices = ubsLabels.map((label, index) => normalizeString(label) === normalizeString(selectedUbsKey) ? index : -1).filter(index => index !== -1);
+        const filteredUbsIndices = ubsLabels.map((label, index) => {
+            return (!selectedUbsKey || normalizeString(label) === normalizeString(selectedUbsKey)) ? index : -1;
+        }).filter(index => index !== -1);
 
+        // Filtro de Faixa Etária
+        const ageGroupLabels = processedData.ageGroupData.labels;
+        const ageGroupIndex = ageGroupLabels.indexOf(selectedAgeGroup);
         chartData.ageGroupData = {
-            labels: processedData.ageGroupData.labels,
-            datasets: selectedUbsKey ? processedData.ageGroupData.datasets.filter(d => normalizeString(d.label) === normalizeString(selectedUbsKey)) : processedData.ageGroupData.datasets
+            labels: selectedAgeGroup ? [selectedAgeGroup] : ageGroupLabels,
+            datasets: processedData.ageGroupData.datasets.filter((_, index) => filteredUbsIndices.includes(index))
+                .map(dataset => ({
+                    ...dataset,
+                    data: selectedAgeGroup ? [dataset.data[ageGroupIndex]] : dataset.data
+                }))
         };
         
-        const vulnerabilityLabels = selectedUbsKey ? [selectedUbsKey] : processedData.vulnerabilityData.labels;
-        const vulnerabilityDatasets = processedData.vulnerabilityData.levels.map((level, i) => ({
-            label: level,
-            data: processedData.vulnerabilityData.datasets.map(d => d.data[i]).filter((_, index) => !selectedUbsKey || filteredUbsIndices.includes(index)),
-            backgroundColor: processedData.vulnerabilityData.colors[i]
-        }));
-        chartData.vulnerabilityData = { labels: vulnerabilityLabels, datasets: vulnerabilityDatasets };
+        // Filtro de Vulnerabilidade
+        const vulnerabilityLevels = processedData.vulnerabilityData.levels;
+        const vulnerabilityIndex = vulnerabilityLevels.indexOf(selectedVulnerability);
+        chartData.vulnerabilityData = {
+            labels: ubsLabels.filter((_, index) => filteredUbsIndices.includes(index)),
+            datasets: vulnerabilityLevels.map((level, i) => ({
+                label: level,
+                data: processedData.vulnerabilityData.datasets.map(d => d.data[i]).filter((_, ubsIndex) => filteredUbsIndices.includes(ubsIndex)),
+                backgroundColor: processedData.vulnerabilityData.colors[i]
+            })).filter((_, levelIndex) => !selectedVulnerability || levelIndex === vulnerabilityIndex)
+        };
 
+        // Outros gráficos
         chartData.ubsPopulationData = {
-            labels: selectedUbsKey ? [selectedUbsKey] : processedData.ubsPopulationData.labels,
+            labels: ubsLabels.filter((_, index) => filteredUbsIndices.includes(index)),
             datasets: [{
                 label: "População Cadastrada",
-                data: processedData.ubsPopulationData.datasets[0].data.filter((_, index) => !selectedUbsKey || filteredUbsIndices.includes(index)),
+                data: processedData.ubsPopulationData.datasets[0].data.filter((_, index) => filteredUbsIndices.includes(index)),
                 backgroundColor: "#3498db"
             }]
         };
         chartData.historicalData = processedData.historicalData;
 
+        // 3. PREPARAR DADOS PARA OS CARDS DE ESTATÍSTICAS
         const statsData = {
             totalUBS: tableData.ubsTableData.length,
             eldoradoPopulation: selectedUbsKey ? tableData.ubsTableData.reduce((sum, ubs) => sum + ubs.population, 0).toLocaleString("pt-BR") : processedData.eldoradoPopulation
         };
 
+        // 4. RENDERIZAR TUDO
         renderStats(statsData);
         renderTables(tableData);
         renderCharts(chartData);
@@ -163,26 +189,16 @@ document.addEventListener("DOMContentLoaded", function() {
         Object.values(charts).forEach(chart => { if(chart) chart.destroy(); });
 
         const stackedBarOptions = { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: false }, tooltip: { enabled: true }, datalabels: { display: false } } };
-
         const barOptionsWithLabels = {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
-                tooltip: { enabled: false },
-                datalabels: {
-                    anchor: 'end',
-                    align: 'top',
-                    color: 'black',
-                    font: { weight: 'bold' },
-                    formatter: value => value.toLocaleString('pt-BR')
-                }
+                legend: { display: false }, tooltip: { enabled: false },
+                datalabels: { anchor: 'end', align: 'top', color: 'black', font: { weight: 'bold' }, formatter: value => value.toLocaleString('pt-BR') }
             }
         };
 
         charts.ageGroup = new Chart(document.getElementById("ageGroupChart").getContext("2d"), { type: "bar", data: chartData.ageGroupData, options: stackedBarOptions });
         charts.vulnerability = new Chart(document.getElementById("vulnerabilityChart").getContext("2d"), { type: "bar", data: chartData.vulnerabilityData, options: stackedBarOptions });
-        
         charts.ubsPopulation = new Chart(document.getElementById("ubsChart").getContext("2d"), { type: "bar", data: chartData.ubsPopulationData, options: barOptionsWithLabels });
         charts.historical = new Chart(document.getElementById("historicalChart").getContext("2d"), { type: "bar", data: chartData.historicalData, options: barOptionsWithLabels });
         
@@ -208,12 +224,20 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // --- EVENT LISTENERS ---
     window.clearFilters = function() {
         ubsFilter.value = "";
+        vulnerabilityFilter.value = "";
+        ageGroupFilter.value = "";
         renderDashboard();
     };
     window.downloadExcel = function() { alert("Funcionalidade de download de Excel ainda não implementada."); };
-    ubsFilter.addEventListener("change", renderDashboard);
+    
+    // Adiciona o listener para todos os filtros
+    [ubsFilter, vulnerabilityFilter, ageGroupFilter].forEach(filter => {
+        filter.addEventListener("change", renderDashboard);
+    });
 
+    // --- INICIALIZAÇÃO ---
     renderDashboard();
 });
