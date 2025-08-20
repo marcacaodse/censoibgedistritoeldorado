@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const districtTableBody = document.querySelector("#districtTable tbody");
     const ubsTableBody = document.querySelector("#ubsTable tbody");
 
+    // **** CORREÇÃO APLICADA AQUI: REGISTRA O PLUGIN GLOBALMENTE ****
+    Chart.register(ChartDataLabels);
+
     // ===================================================================================
     // FONTE DE DADOS PRINCIPAL
     // ===================================================================================
@@ -156,30 +159,23 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // **** FUNÇÃO DE RENDERIZAR GRÁFICOS ATUALIZADA ****
     function renderCharts(chartData) {
         Object.values(charts).forEach(chart => { if(chart) chart.destroy(); });
 
-        // Opções para os gráficos que NÃO terão etiquetas
-        const stackedBarOptions = { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: false }, tooltip: { enabled: false } } };
+        const stackedBarOptions = { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: false }, tooltip: { enabled: true }, datalabels: { display: false } } };
 
-        // Opções para os gráficos que TERÃO etiquetas
         const barOptionsWithLabels = {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                tooltip: { enabled: false }, // Desativa a dica ao passar o mouse
+                tooltip: { enabled: false },
                 datalabels: {
-                    anchor: 'end', // Posição da etiqueta (no final da barra)
-                    align: 'top', // Alinhamento da etiqueta (acima da barra)
-                    color: 'black', // Cor da etiqueta
-                    font: {
-                        weight: 'bold' // Estilo da fonte em negrito
-                    },
-                    formatter: function(value) {
-                        return value.toLocaleString('pt-BR'); // Formata o número para o padrão brasileiro
-                    }
+                    anchor: 'end',
+                    align: 'top',
+                    color: 'black',
+                    font: { weight: 'bold' },
+                    formatter: value => value.toLocaleString('pt-BR')
                 }
             }
         };
@@ -187,7 +183,6 @@ document.addEventListener("DOMContentLoaded", function() {
         charts.ageGroup = new Chart(document.getElementById("ageGroupChart").getContext("2d"), { type: "bar", data: chartData.ageGroupData, options: stackedBarOptions });
         charts.vulnerability = new Chart(document.getElementById("vulnerabilityChart").getContext("2d"), { type: "bar", data: chartData.vulnerabilityData, options: stackedBarOptions });
         
-        // Aplicando as novas opções aos gráficos corretos
         charts.ubsPopulation = new Chart(document.getElementById("ubsChart").getContext("2d"), { type: "bar", data: chartData.ubsPopulationData, options: barOptionsWithLabels });
         charts.historical = new Chart(document.getElementById("historicalChart").getContext("2d"), { type: "bar", data: chartData.historicalData, options: barOptionsWithLabels });
         
