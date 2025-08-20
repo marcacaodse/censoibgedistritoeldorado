@@ -85,38 +85,39 @@ document.addEventListener("DOMContentLoaded", function() {
             { label: "População 2022", data: processedData.districtTableData.map(d => d.pop2022), backgroundColor: "#3498db" }
         ]
     };
+    
+    // **** ALTERAÇÃO 1: MUDANDO A COR DA BARRA PARA VERMELHO ****
     processedData.ubsPopulationData = {
         labels: processedData.ubsTableData.map(d => d.ubs),
-        datasets: [{ label: "População Cadastrada", data: processedData.ubsTableData.map(d => d.population), backgroundColor: "#3498db" }]
+        datasets: [{ 
+            label: "População Cadastrada", 
+            data: processedData.ubsTableData.map(d => d.population), 
+            backgroundColor: "#e74c3c" // Cor vermelha
+        }]
     };
 
     let charts = {};
 
-    // **** FUNÇÃO PRINCIPAL ATUALIZADA ****
     function renderDashboard() {
         const selectedUbsKey = ubsFilter.value;
         const selectedVulnerability = vulnerabilityFilter.value;
         const selectedAgeGroup = ageGroupFilter.value;
         const normalizeString = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase() : "";
         
-        // 1. FILTRAR DADOS PARA TABELAS
         const tableData = {
             districtTableData: processedData.districtTableData,
             ubsTableData: processedData.ubsTableData.filter(ubs => {
                 if (selectedUbsKey && normalizeString(ubs.ubs) !== normalizeString(selectedUbsKey)) return false;
-                // Adicionar lógicas de filtro de tabela para vulnerabilidade e faixa etária se necessário no futuro
                 return true;
             })
         };
 
-        // 2. FILTRAR DADOS PARA GRÁFICOS
         const chartData = {};
         const ubsLabels = processedData.ubsTableData.map(u => u.ubs);
         const filteredUbsIndices = ubsLabels.map((label, index) => {
             return (!selectedUbsKey || normalizeString(label) === normalizeString(selectedUbsKey)) ? index : -1;
         }).filter(index => index !== -1);
 
-        // Filtro de Faixa Etária
         const ageGroupLabels = processedData.ageGroupData.labels;
         const ageGroupIndex = ageGroupLabels.indexOf(selectedAgeGroup);
         chartData.ageGroupData = {
@@ -128,7 +129,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 }))
         };
         
-        // Filtro de Vulnerabilidade
         const vulnerabilityLevels = processedData.vulnerabilityData.levels;
         const vulnerabilityIndex = vulnerabilityLevels.indexOf(selectedVulnerability);
         chartData.vulnerabilityData = {
@@ -140,24 +140,21 @@ document.addEventListener("DOMContentLoaded", function() {
             })).filter((_, levelIndex) => !selectedVulnerability || levelIndex === vulnerabilityIndex)
         };
 
-        // Outros gráficos
         chartData.ubsPopulationData = {
             labels: ubsLabels.filter((_, index) => filteredUbsIndices.includes(index)),
             datasets: [{
                 label: "População Cadastrada",
                 data: processedData.ubsPopulationData.datasets[0].data.filter((_, index) => filteredUbsIndices.includes(index)),
-                backgroundColor: "#3498db"
+                backgroundColor: "#e74c3c" // Garante que a cor vermelha seja mantida ao filtrar
             }]
         };
         chartData.historicalData = processedData.historicalData;
 
-        // 3. PREPARAR DADOS PARA OS CARDS DE ESTATÍSTICAS
         const statsData = {
             totalUBS: tableData.ubsTableData.length,
             eldoradoPopulation: selectedUbsKey ? tableData.ubsTableData.reduce((sum, ubs) => sum + ubs.population, 0).toLocaleString("pt-BR") : processedData.eldoradoPopulation
         };
 
-        // 4. RENDERIZAR TUDO
         renderStats(statsData);
         renderTables(tableData);
         renderCharts(chartData);
@@ -166,7 +163,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function renderStats(statsData) {
         document.getElementById("totalPopulation").textContent = processedData.totalPopulation;
         document.getElementById("totalUBS").textContent = statsData.totalUBS;
-        document.getElementById("totalDistricts").textContent = processedData.totalDistricts;
+        document.getElementById("totalDistricts").textContent = statsData.totalDistricts;
         document.getElementById("eldoradoPopulation").textContent = statsData.eldoradoPopulation;
     }
 
@@ -185,22 +182,50 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // **** ALTERAÇÃO 2: NOVAS OPÇÕES PARA OS GRÁFICOS ****
     function renderCharts(chartData) {
         Object.values(charts).forEach(chart => { if(chart) chart.destroy(); });
 
-        const stackedBarOptions = { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: false }, tooltip: { enabled: true }, datalabels: { display: false } } };
-        const barOptionsWithLabels = {
+        // Opção para gráficos empilhados (sem rótulos)
+        const stackedBarOptions = {
+            responsive: true, maintainAspectRatio: false,
+            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+            plugins: { legend: { display: false }, tooltip: { enabled: true }, datalabels: { display: false } }
+        };
+
+        // Opção para o gráfico de População por Distrito (rótulos externos)
+        const historicalOptions = {
             responsive: true, maintainAspectRatio: false,
             plugins: {
                 legend: { display: false }, tooltip: { enabled: false },
-                datalabels: { anchor: 'end', align: 'top', color: 'black', font: { weight: 'bold' }, formatter: value => value.toLocaleString('pt-BR') }
+                datalabels: {
+                    anchor: 'end', align: 'top', color: 'black', font: { weight: 'bold' },
+                    formatter: value => value.toLocaleString('pt-BR')
+                }
+            }
+        };
+        
+        // Opção para o gráfico de População por Unidade (rótulos internos)
+        const ubsPopulationOptions = {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }, tooltip: { enabled: false },
+                datalabels: {
+                    anchor: 'center', // Posição da etiqueta no centro da barra
+                    align: 'center', // Alinhamento da etiqueta no centro
+                    color: 'white', // Cor da etiqueta
+                    font: { weight: 'bold' },
+                    formatter: value => value.toLocaleString('pt-BR')
+                }
             }
         };
 
+        // Aplicando as opções corretas para cada gráfico
         charts.ageGroup = new Chart(document.getElementById("ageGroupChart").getContext("2d"), { type: "bar", data: chartData.ageGroupData, options: stackedBarOptions });
         charts.vulnerability = new Chart(document.getElementById("vulnerabilityChart").getContext("2d"), { type: "bar", data: chartData.vulnerabilityData, options: stackedBarOptions });
-        charts.ubsPopulation = new Chart(document.getElementById("ubsChart").getContext("2d"), { type: "bar", data: chartData.ubsPopulationData, options: barOptionsWithLabels });
-        charts.historical = new Chart(document.getElementById("historicalChart").getContext("2d"), { type: "bar", data: chartData.historicalData, options: barOptionsWithLabels });
+        
+        charts.ubsPopulation = new Chart(document.getElementById("ubsChart").getContext("2d"), { type: "bar", data: chartData.ubsPopulationData, options: ubsPopulationOptions });
+        charts.historical = new Chart(document.getElementById("historicalChart").getContext("2d"), { type: "bar", data: chartData.historicalData, options: historicalOptions });
         
         Object.keys(charts).forEach(key => updateCustomLegend(`${key}Legend`, charts[key]));
     }
@@ -224,7 +249,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // --- EVENT LISTENERS ---
     window.clearFilters = function() {
         ubsFilter.value = "";
         vulnerabilityFilter.value = "";
@@ -233,11 +257,9 @@ document.addEventListener("DOMContentLoaded", function() {
     };
     window.downloadExcel = function() { alert("Funcionalidade de download de Excel ainda não implementada."); };
     
-    // Adiciona o listener para todos os filtros
     [ubsFilter, vulnerabilityFilter, ageGroupFilter].forEach(filter => {
         filter.addEventListener("change", renderDashboard);
     });
 
-    // --- INICIALIZAÇÃO ---
     renderDashboard();
 });
