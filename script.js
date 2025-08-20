@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
     Chart.register(ChartDataLabels);
 
     // ===================================================================================
-    // FONTE DE DADOS PRINCIPAL
+    // FONTE DE DADOS PRINCIPAL (Sem alterações)
     // ===================================================================================
     const data = {
         totalPopulation: "621.863",
@@ -85,14 +85,12 @@ document.addEventListener("DOMContentLoaded", function() {
             { label: "População 2022", data: processedData.districtTableData.map(d => d.pop2022), backgroundColor: "#3498db" }
         ]
     };
-    
-    // **** ALTERAÇÃO 1: MUDANDO A COR DA BARRA PARA VERMELHO ****
     processedData.ubsPopulationData = {
         labels: processedData.ubsTableData.map(d => d.ubs),
         datasets: [{ 
             label: "População Cadastrada", 
             data: processedData.ubsTableData.map(d => d.population), 
-            backgroundColor: "#e74c3c" // Cor vermelha
+            backgroundColor: "#e74c3c"
         }]
     };
 
@@ -145,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function() {
             datasets: [{
                 label: "População Cadastrada",
                 data: processedData.ubsPopulationData.datasets[0].data.filter((_, index) => filteredUbsIndices.includes(index)),
-                backgroundColor: "#e74c3c" // Garante que a cor vermelha seja mantida ao filtrar
+                backgroundColor: "#e74c3c"
             }]
         };
         chartData.historicalData = processedData.historicalData;
@@ -163,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function renderStats(statsData) {
         document.getElementById("totalPopulation").textContent = processedData.totalPopulation;
         document.getElementById("totalUBS").textContent = statsData.totalUBS;
-        document.getElementById("totalDistricts").textContent = statsData.totalDistricts;
+        document.getElementById("totalDistricts").textContent = processedData.totalDistricts;
         document.getElementById("eldoradoPopulation").textContent = statsData.eldoradoPopulation;
     }
 
@@ -182,18 +180,16 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // **** ALTERAÇÃO 2: NOVAS OPÇÕES PARA OS GRÁFICOS ****
+    // **** FUNÇÃO DE RENDERIZAR GRÁFICOS ATUALIZADA ****
     function renderCharts(chartData) {
         Object.values(charts).forEach(chart => { if(chart) chart.destroy(); });
 
-        // Opção para gráficos empilhados (sem rótulos)
         const stackedBarOptions = {
             responsive: true, maintainAspectRatio: false,
             scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
             plugins: { legend: { display: false }, tooltip: { enabled: true }, datalabels: { display: false } }
         };
 
-        // Opção para o gráfico de População por Distrito (rótulos externos)
         const historicalOptions = {
             responsive: true, maintainAspectRatio: false,
             plugins: {
@@ -205,22 +201,23 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         };
         
-        // Opção para o gráfico de População por Unidade (rótulos internos)
+        // **** OPÇÕES ATUALIZADAS PARA O GRÁFICO DE POPULAÇÃO POR UNIDADE ****
         const ubsPopulationOptions = {
             responsive: true, maintainAspectRatio: false,
             plugins: {
                 legend: { display: false }, tooltip: { enabled: false },
                 datalabels: {
-                    anchor: 'center', // Posição da etiqueta no centro da barra
-                    align: 'center', // Alinhamento da etiqueta no centro
-                    color: 'white', // Cor da etiqueta
-                    font: { weight: 'bold' },
+                    anchor: 'center', align: 'center', color: 'white',
+                    font: { 
+                        weight: 'bold',
+                        size: 14, // Aumentando o tamanho da fonte
+                    },
+                    rotation: -90, // Rotacionando o texto para a vertical
                     formatter: value => value.toLocaleString('pt-BR')
                 }
             }
         };
 
-        // Aplicando as opções corretas para cada gráfico
         charts.ageGroup = new Chart(document.getElementById("ageGroupChart").getContext("2d"), { type: "bar", data: chartData.ageGroupData, options: stackedBarOptions });
         charts.vulnerability = new Chart(document.getElementById("vulnerabilityChart").getContext("2d"), { type: "bar", data: chartData.vulnerabilityData, options: stackedBarOptions });
         
