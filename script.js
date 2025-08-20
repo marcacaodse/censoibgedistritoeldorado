@@ -1,8 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     // --- ELEMENTOS DO DOM ---
     const ubsFilter = document.getElementById("ubsFilter");
-    const vulnerabilityFilter = document.getElementById("vulnerabilityFilter");
-    const ageGroupFilter = document.getElementById("ageGroupFilter");
     const districtTableBody = document.querySelector("#districtTable tbody");
     const ubsTableBody = document.querySelector("#ubsTable tbody");
 
@@ -70,7 +68,6 @@ document.addEventListener("DOMContentLoaded", function() {
         ]
     };
 
-    // --- PROCESSAMENTO INICIAL DOS DADOS ---
     const processedData = JSON.parse(JSON.stringify(data));
     processedData.districtTableData = processedData.districtTableData.map(d => {
         const growth = d.pop2022 - d.pop2010;
@@ -89,10 +86,8 @@ document.addEventListener("DOMContentLoaded", function() {
         datasets: [{ label: "População Cadastrada", data: processedData.ubsTableData.map(d => d.population), backgroundColor: "#3498db" }]
     };
 
-    // --- VARIÁVEIS GLOBAIS PARA OS GRÁFICOS ---
     let charts = {};
 
-    // --- FUNÇÕES DE RENDERIZAÇÃO ---
     function renderDashboard() {
         const selectedUbsKey = ubsFilter.value;
         const normalizeString = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase() : "";
@@ -103,6 +98,9 @@ document.addEventListener("DOMContentLoaded", function() {
         };
 
         const chartData = {};
+        const ubsLabels = processedData.ubsTableData.map(u => u.ubs);
+        const filteredUbsIndices = ubsLabels.map((label, index) => normalizeString(label) === normalizeString(selectedUbsKey) ? index : -1).filter(index => index !== -1);
+
         chartData.ageGroupData = {
             labels: processedData.ageGroupData.labels,
             datasets: selectedUbsKey ? processedData.ageGroupData.datasets.filter(d => normalizeString(d.label) === normalizeString(selectedUbsKey)) : processedData.ageGroupData.datasets
@@ -111,23 +109,16 @@ document.addEventListener("DOMContentLoaded", function() {
         const vulnerabilityLabels = selectedUbsKey ? [selectedUbsKey] : processedData.vulnerabilityData.labels;
         const vulnerabilityDatasets = processedData.vulnerabilityData.levels.map((level, i) => ({
             label: level,
-            data: processedData.vulnerabilityData.labels.map(ubsLabel => {
-                const ubsData = processedData.vulnerabilityData.datasets.find(d => d.ubs === ubsLabel);
-                return ubsData ? ubsData.data[i] : 0;
-            }).filter((_, index) => !selectedUbsKey || processedData.vulnerabilityData.labels[index] === selectedUbsKey),
+            data: processedData.vulnerabilityData.datasets.map(d => d.data[i]).filter((_, index) => !selectedUbsKey || filteredUbsIndices.includes(index)),
             backgroundColor: processedData.vulnerabilityData.colors[i]
         }));
-
-        chartData.vulnerabilityData = {
-            labels: vulnerabilityLabels,
-            datasets: vulnerabilityDatasets
-        };
+        chartData.vulnerabilityData = { labels: vulnerabilityLabels, datasets: vulnerabilityDatasets };
 
         chartData.ubsPopulationData = {
             labels: selectedUbsKey ? [selectedUbsKey] : processedData.ubsPopulationData.labels,
             datasets: [{
                 label: "População Cadastrada",
-                data: processedData.ubsPopulationData.datasets[0].data.filter((_, index) => !selectedUbsKey || processedData.ubsPopulationData.labels[index] === selectedUbsKey),
+                data: processedData.ubsPopulationData.datasets[0].data.filter((_, index) => !selectedUbsKey || filteredUbsIndices.includes(index)),
                 backgroundColor: "#3498db"
             }]
         };
@@ -165,16 +156,40 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // **** FUNÇÃO DE RENDERIZAR GRÁFICOS ATUALIZADA ****
     function renderCharts(chartData) {
-        Object.values(charts).forEach(chart => chart.destroy());
+        Object.values(charts).forEach(chart => { if(chart) chart.destroy(); });
 
-        const commonBarOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
-        const stackedBarOptions = { ...commonBarOptions, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } };
+        // Opções para os gráficos que NÃO terão etiquetas
+        const stackedBarOptions = { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: false }, tooltip: { enabled: false } } };
+
+        // Opções para os gráficos que TERÃO etiquetas
+        const barOptionsWithLabels = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }, // Desativa a dica ao passar o mouse
+                datalabels: {
+                    anchor: 'end', // Posição da etiqueta (no final da barra)
+                    align: 'top', // Alinhamento da etiqueta (acima da barra)
+                    color: 'black', // Cor da etiqueta
+                    font: {
+                        weight: 'bold' // Estilo da fonte em negrito
+                    },
+                    formatter: function(value) {
+                        return value.toLocaleString('pt-BR'); // Formata o número para o padrão brasileiro
+                    }
+                }
+            }
+        };
 
         charts.ageGroup = new Chart(document.getElementById("ageGroupChart").getContext("2d"), { type: "bar", data: chartData.ageGroupData, options: stackedBarOptions });
         charts.vulnerability = new Chart(document.getElementById("vulnerabilityChart").getContext("2d"), { type: "bar", data: chartData.vulnerabilityData, options: stackedBarOptions });
-        charts.ubsPopulation = new Chart(document.getElementById("ubsChart").getContext("2d"), { type: "bar", data: chartData.ubsPopulationData, options: commonBarOptions });
-        charts.historical = new Chart(document.getElementById("historicalChart").getContext("2d"), { type: "bar", data: chartData.historicalData, options: commonBarOptions });
+        
+        // Aplicando as novas opções aos gráficos corretos
+        charts.ubsPopulation = new Chart(document.getElementById("ubsChart").getContext("2d"), { type: "bar", data: chartData.ubsPopulationData, options: barOptionsWithLabels });
+        charts.historical = new Chart(document.getElementById("historicalChart").getContext("2d"), { type: "bar", data: chartData.historicalData, options: barOptionsWithLabels });
         
         Object.keys(charts).forEach(key => updateCustomLegend(`${key}Legend`, charts[key]));
     }
@@ -198,17 +213,12 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // --- EVENT LISTENERS ---
     window.clearFilters = function() {
         ubsFilter.value = "";
         renderDashboard();
     };
     window.downloadExcel = function() { alert("Funcionalidade de download de Excel ainda não implementada."); };
     ubsFilter.addEventListener("change", renderDashboard);
-    // Os outros filtros não estão sendo usados no momento, mas podem ser reativados no futuro
-    // vulnerabilityFilter.addEventListener("change", renderDashboard);
-    // ageGroupFilter.addEventListener("change", renderDashboard);
 
-    // --- INICIALIZAÇÃO ---
     renderDashboard();
 });
