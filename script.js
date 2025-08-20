@@ -62,4 +62,153 @@ document.addEventListener("DOMContentLoaded", function() {
             { ubs: "CSU Eldorado", population: 15678, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" },
             { ubs: "Jardim Bandeirantes", population: 7891, vulnerability: "Média", ageGroup: "5-11 anos", status: "Ativa" },
             { ubs: "Jardim Eldorado", population: 11234, vulnerability: "Baixa", ageGroup: "30-59 anos", status: "Ativa" },
-          
+            { ubs: "Novo Eldorado", population: 12567, vulnerability: "Elevada", ageGroup: "18-29 anos", status: "Ativa" },
+            { ubs: "Parque São João", population: 9876, vulnerability: "Muito Elevada", ageGroup: "0-4 anos", status: "Ativa" },
+            { ubs: "Perobas", population: 6543, vulnerability: "Média", ageGroup: "60+ anos", status: "Ativa" },
+            { ubs: "Santa Cruz", population: 10123, vulnerability: "Baixa", ageGroup: "12-17 anos", status: "Ativa" },
+            { ubs: "Unidade XV", population: 9776, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" }
+        ]
+    };
+
+    // --- PROCESSAMENTO INICIAL DOS DADOS ---
+    const processedData = JSON.parse(JSON.stringify(data));
+    processedData.districtTableData = processedData.districtTableData.map(d => {
+        const growth = d.pop2022 - d.pop2010;
+        const growthPct = d.pop2010 === 0 ? 0 : (growth / d.pop2010) * 100;
+        return { ...d, growth: growth.toLocaleString('pt-BR', { signDisplay: 'always' }), growthPct: `${growth > 0 ? '+' : ''}${growthPct.toFixed(1)}%` };
+    });
+    processedData.historicalData = {
+        labels: processedData.districtTableData.map(d => d.district),
+        datasets: [
+            { label: "População 2010", data: processedData.districtTableData.map(d => d.pop2010), backgroundColor: "#2c3e50" },
+            { label: "População 2022", data: processedData.districtTableData.map(d => d.pop2022), backgroundColor: "#3498db" }
+        ]
+    };
+    processedData.ubsPopulationData = {
+        labels: processedData.ubsTableData.map(d => d.ubs),
+        datasets: [{ label: "População Cadastrada", data: processedData.ubsTableData.map(d => d.population), backgroundColor: "#3498db" }]
+    };
+
+    // --- VARIÁVEIS GLOBAIS PARA OS GRÁFICOS ---
+    let charts = {};
+
+    // --- FUNÇÕES DE RENDERIZAÇÃO ---
+    function renderDashboard() {
+        const selectedUbsKey = ubsFilter.value;
+        const normalizeString = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase() : "";
+        
+        const tableData = {
+            districtTableData: processedData.districtTableData,
+            ubsTableData: selectedUbsKey ? processedData.ubsTableData.filter(u => normalizeString(u.ubs) === normalizeString(selectedUbsKey)) : processedData.ubsTableData
+        };
+
+        const chartData = {};
+        chartData.ageGroupData = {
+            labels: processedData.ageGroupData.labels,
+            datasets: selectedUbsKey ? processedData.ageGroupData.datasets.filter(d => normalizeString(d.label) === normalizeString(selectedUbsKey)) : processedData.ageGroupData.datasets
+        };
+        
+        const vulnerabilityLabels = selectedUbsKey ? [selectedUbsKey] : processedData.vulnerabilityData.labels;
+        const vulnerabilityDatasets = processedData.vulnerabilityData.levels.map((level, i) => ({
+            label: level,
+            data: processedData.vulnerabilityData.labels.map(ubsLabel => {
+                const ubsData = processedData.vulnerabilityData.datasets.find(d => d.ubs === ubsLabel);
+                return ubsData ? ubsData.data[i] : 0;
+            }).filter((_, index) => !selectedUbsKey || processedData.vulnerabilityData.labels[index] === selectedUbsKey),
+            backgroundColor: processedData.vulnerabilityData.colors[i]
+        }));
+
+        chartData.vulnerabilityData = {
+            labels: vulnerabilityLabels,
+            datasets: vulnerabilityDatasets
+        };
+
+        chartData.ubsPopulationData = {
+            labels: selectedUbsKey ? [selectedUbsKey] : processedData.ubsPopulationData.labels,
+            datasets: [{
+                label: "População Cadastrada",
+                data: processedData.ubsPopulationData.datasets[0].data.filter((_, index) => !selectedUbsKey || processedData.ubsPopulationData.labels[index] === selectedUbsKey),
+                backgroundColor: "#3498db"
+            }]
+        };
+        chartData.historicalData = processedData.historicalData;
+
+        const statsData = {
+            totalUBS: tableData.ubsTableData.length,
+            eldoradoPopulation: selectedUbsKey ? tableData.ubsTableData.reduce((sum, ubs) => sum + ubs.population, 0).toLocaleString("pt-BR") : processedData.eldoradoPopulation
+        };
+
+        renderStats(statsData);
+        renderTables(tableData);
+        renderCharts(chartData);
+    }
+
+    function renderStats(statsData) {
+        document.getElementById("totalPopulation").textContent = processedData.totalPopulation;
+        document.getElementById("totalUBS").textContent = statsData.totalUBS;
+        document.getElementById("totalDistricts").textContent = processedData.totalDistricts;
+        document.getElementById("eldoradoPopulation").textContent = statsData.eldoradoPopulation;
+    }
+
+    function renderTables(tableData) {
+        districtTableBody.innerHTML = "";
+        tableData.districtTableData.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${row.district}</td><td>${row.pop2010.toLocaleString("pt-BR")}</td><td>${row.pop2022.toLocaleString("pt-BR")}</td><td class="${row.growth.startsWith('+') ? "growth-positive" : "growth-negative"}">${row.growth}</td><td class="${row.growthPct.startsWith('+') ? "growth-positive" : "growth-negative"}">${row.growthPct}</td>`;
+            districtTableBody.appendChild(tr);
+        });
+        ubsTableBody.innerHTML = "";
+        tableData.ubsTableData.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${row.ubs}</td><td>${row.population.toLocaleString("pt-BR")}</td><td>${row.vulnerability}</td><td>${row.ageGroup}</td><td><span class="badge badge-success">${row.status}</span></td>`;
+            ubsTableBody.appendChild(tr);
+        });
+    }
+
+    function renderCharts(chartData) {
+        Object.values(charts).forEach(chart => chart.destroy());
+
+        const commonBarOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+        const stackedBarOptions = { ...commonBarOptions, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } };
+
+        charts.ageGroup = new Chart(document.getElementById("ageGroupChart").getContext("2d"), { type: "bar", data: chartData.ageGroupData, options: stackedBarOptions });
+        charts.vulnerability = new Chart(document.getElementById("vulnerabilityChart").getContext("2d"), { type: "bar", data: chartData.vulnerabilityData, options: stackedBarOptions });
+        charts.ubsPopulation = new Chart(document.getElementById("ubsChart").getContext("2d"), { type: "bar", data: chartData.ubsPopulationData, options: commonBarOptions });
+        charts.historical = new Chart(document.getElementById("historicalChart").getContext("2d"), { type: "bar", data: chartData.historicalData, options: commonBarOptions });
+        
+        Object.keys(charts).forEach(key => updateCustomLegend(`${key}Legend`, charts[key]));
+    }
+
+    function updateCustomLegend(legendId, chart) {
+        const legendContainer = document.getElementById(legendId);
+        if (!legendContainer) return;
+        legendContainer.innerHTML = "";
+        const legendItems = chart.options.plugins.legend.labels.generateLabels(chart);
+        legendItems.forEach(item => {
+            const legendItemDiv = document.createElement("div");
+            legendItemDiv.className = "legend-item";
+            legendItemDiv.style.cursor = "pointer";
+            legendItemDiv.style.opacity = item.hidden ? 0.5 : 1;
+            legendItemDiv.innerHTML = `<span class="legend-color" style="background-color: ${item.fillStyle}"></span> ${item.text}`;
+            legendItemDiv.onclick = () => {
+                chart.toggleDataVisibility(item.index);
+                chart.update();
+            };
+            legendContainer.appendChild(legendItemDiv);
+        });
+    }
+
+    // --- EVENT LISTENERS ---
+    window.clearFilters = function() {
+        ubsFilter.value = "";
+        renderDashboard();
+    };
+    window.downloadExcel = function() { alert("Funcionalidade de download de Excel ainda não implementada."); };
+    ubsFilter.addEventListener("change", renderDashboard);
+    // Os outros filtros não estão sendo usados no momento, mas podem ser reativados no futuro
+    // vulnerabilityFilter.addEventListener("change", renderDashboard);
+    // ageGroupFilter.addEventListener("change", renderDashboard);
+
+    // --- INICIALIZAÇÃO ---
+    renderDashboard();
+});
