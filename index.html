@@ -6,15 +6,13 @@
     <title>Censo IBGE - População de Contagem MG - Distrito Sanitário Eldorado</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- **** PLUGIN ADICIONADO AQUI **** -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <!-- O resto do seu body continua exatamente o mesmo -->
     <div class="dashboard-container">
-        <!-- Header -->
+        <!-- Header (sem alterações ) -->
         <div class="header-section">
             <a href="https://app.powerbi.com/view?r=eyJrIjoiZTlkOWNhODEtNmU3Ny00OWJiLTkxOGYtM2Q4YzEwZjRlNTRkIiwidCI6ImFlODYzMzdlLTU3NWUtNDMzMC05NDc2LTkzZGU2ODJiMDAyM" 
                class="btn-power-bi" target="_blank">
@@ -51,14 +49,26 @@
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Índice de Vulnerabilidade</label>
-                    <select class="filter-select" id="vulnerabilityFilter" disabled>
-                        <option value="">Todos (Em breve)</option>
+                    <!-- **** CORREÇÃO: Removido o 'disabled' **** -->
+                    <select class="filter-select" id="vulnerabilityFilter">
+                        <option value="">Todos os Índices</option>
+                        <option value="Baixa">Baixa</option>
+                        <option value="Média">Média</option>
+                        <option value="Elevada">Elevada</option>
+                        <option value="Muito Elevada">Muito Elevada</option>
                     </select>
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Faixa Etária</label>
-                    <select class="filter-select" id="ageGroupFilter" disabled>
-                        <option value="">Todas (Em breve)</option>
+                     <!-- **** CORREÇÃO: Removido o 'disabled' **** -->
+                    <select class="filter-select" id="ageGroupFilter">
+                        <option value="">Todas as Faixas</option>
+                        <option value="0 a 4 anos">0 a 4 anos</option>
+                        <option value="5 a 11 anos">5 a 11 anos</option>
+                        <option value="12 a 17 anos">12 a 17 anos</option>
+                        <option value="18 a 29 anos">18 a 29 anos</option>
+                        <option value="30 a 59 anos">30 a 59 anos</option>
+                        <option value="60 anos ou mais">60 anos ou mais</option>
                     </select>
                 </div>
             </div>
@@ -71,7 +81,8 @@
                 </button>
             </div>
         </div>
-
+        
+        <!-- O resto do HTML continua igual -->
         <!-- Estatísticas Gerais -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card">
