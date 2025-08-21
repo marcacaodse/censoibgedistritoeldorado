@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 { ubs: "Água Branca", data: [2112, 7597, 1314, 565] },
                 { ubs: "Bela Vista", data: [815, 1540, 1985, 0] },
                 { ubs: "CSU Eldorado", data: [19364, 2259, 0, 0] },
-                { ubs: "Jardim Bandeirantes", data: [3179, 0, 169, 136] },
+                { ubs: "Jardim Bandeirantes", data: [3179, 10504, 169, 136] },
                 { ubs: "Jardim Eldorado", data: [3434, 2507, 2342, 0] },
                 { ubs: "Novo Eldorado", data: [10463, 1587, 0, 0] },
                 { ubs: "Parque São João", data: [0, 3116, 4658, 1891] },
