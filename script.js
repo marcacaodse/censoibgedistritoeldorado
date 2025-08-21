@@ -59,16 +59,16 @@ document.addEventListener("DOMContentLoaded", function() {
             { district: "Petrolândia", pop2010: 41927, pop2022: 50344 }
         ],
         ubsTableData: [
-            { ubs: "Água Branca", population: 8456, vulnerability: "Média", ageGroup: "30-59 anos", status: "Ativa" },
-            { ubs: "Bela Vista", population: 9234, vulnerability: "Baixa", ageGroup: "18-29 anos", status: "Ativa" },
-            { ubs: "CSU Eldorado", population: 15678, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" },
-            { ubs: "Jardim Bandeirantes", population: 7891, vulnerability: "Média", ageGroup: "5-11 anos", status: "Ativa" },
-            { ubs: "Jardim Eldorado", population: 11234, vulnerability: "Baixa", ageGroup: "30-59 anos", status: "Ativa" },
-            { ubs: "Novo Eldorado", population: 12567, vulnerability: "Elevada", ageGroup: "18-29 anos", status: "Ativa" },
-            { ubs: "Parque São João", population: 9876, vulnerability: "Muito Elevada", ageGroup: "0-4 anos", status: "Ativa" },
-            { ubs: "Perobas", population: 6543, vulnerability: "Média", ageGroup: "60+ anos", status: "Ativa" },
-            { ubs: "Santa Cruz", population: 10123, vulnerability: "Baixa", ageGroup: "12-17 anos", status: "Ativa" },
-            { ubs: "Unidade XV", population: 9776, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" }
+            { ubs: "Água Branca", population: 13584, vulnerability: "Média", ageGroup: "30-59 anos", status: "Ativa" },
+            { ubs: "Bela Vista", population: 5882, vulnerability: "Baixa", ageGroup: "18-29 anos", status: "Ativa" },
+            { ubs: "CSU Eldorado", population: 21056, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" },
+            { ubs: "Jardim Bandeirantes", population: 12380, vulnerability: "Média", ageGroup: "5-11 anos", status: "Ativa" },
+            { ubs: "Jardim Eldorado", population: 9510, vulnerability: "Baixa", ageGroup: "30-59 anos", status: "Ativa" },
+            { ubs: "Novo Eldorado", population: 13300, vulnerability: "Elevada", ageGroup: "18-29 anos", status: "Ativa" },
+            { ubs: "Parque São João", population: 13080, vulnerability: "Muito Elevada", ageGroup: "0-4 anos", status: "Ativa" },
+            { ubs: "Perobas", population: 5983, vulnerability: "Média", ageGroup: "60+ anos", status: "Ativa" },
+            { ubs: "Santa Cruz", population: 11627, vulnerability: "Baixa", ageGroup: "12-17 anos", status: "Ativa" },
+            { ubs: "Unidade XV", population: 22126, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" }
         ]
     };
 
