@@ -1,5 +1,9 @@
 document.addEventListener("DOMContentLoaded", function() {
     // --- ELEMENTOS DO DOM ---
+    const ubsFilter = document.getElementById("ubsFilter");
+    const vulnerabilityFilter = document.getElementById("vulnerabilityFilter");
+    const ageGroupFilter = document.getElementById("ageGroupFilter");
+    const districtFilter = document.getElementById("districtFilter");
     const districtTableBody = document.querySelector("#districtTable tbody");
     const ubsTableBody = document.querySelector("#ubsTable tbody");
     const censusTableBody = document.querySelector("#censusTable tbody");
@@ -8,143 +12,112 @@ document.addEventListener("DOMContentLoaded", function() {
     Chart.register(ChartDataLabels);
 
     // ===================================================================================
-    // MULTI-SELECT FUNCTIONALITY
+    // CUSTOM SELECT COMPONENT FUNCTIONALITY
     // ===================================================================================
     
-    // Variáveis globais para armazenar seleções
-    let selectedFilters = {
-        ubs: [],
-        vulnerability: [],
-        ageGroup: [],
-        district: []
-    };
-
-    // Função para alternar dropdown
-    function toggleMultiSelect(filterId) {
-        const dropdown = document.getElementById(filterId + 'Dropdown');
-        const header = dropdown.previousElementSibling;
+    // Initialize custom select components
+    function initializeCustomSelects() {
+        const customSelects = document.querySelectorAll('.custom-select');
         
-        // Fechar outros dropdowns
-        document.querySelectorAll('.multi-select-dropdown').forEach(dd => {
-            if (dd !== dropdown) {
-                dd.classList.remove('show');
-                dd.previousElementSibling.classList.remove('active');
-            }
+        customSelects.forEach(select => {
+            const trigger = select.querySelector('.select-trigger');
+            const dropdown = select.querySelector('.select-dropdown');
+            const options = select.querySelectorAll('.select-option');
+            const selectText = select.querySelector('.select-text');
+            
+            // Toggle dropdown
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeAllDropdowns();
+                dropdown.classList.toggle('show');
+                trigger.classList.toggle('active');
+            });
+            
+            // Handle option selection
+            options.forEach(option => {
+                const checkbox = option.querySelector('input[type="checkbox"]');
+                const label = option.querySelector('label');
+                
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    checkbox.checked = !checkbox.checked;
+                    handleOptionChange(select);
+                });
+                
+                checkbox.addEventListener('change', function() {
+                    handleOptionChange(select);
+                });
+            });
         });
         
-        // Alternar dropdown atual
-        dropdown.classList.toggle('show');
-        header.classList.toggle('active');
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function() {
+            closeAllDropdowns();
+        });
     }
-
-    // Função para lidar com "Selecionar Todos"
-    function handleSelectAll(filterType) {
-        const allCheckbox = document.getElementById(filterType + '_all');
-        const otherCheckboxes = document.querySelectorAll(`input[onchange="handleOptionChange('${filterType}')"]`);
+    
+    function closeAllDropdowns() {
+        document.querySelectorAll('.select-dropdown').forEach(dropdown => {
+            dropdown.classList.remove('show');
+        });
+        document.querySelectorAll('.select-trigger').forEach(trigger => {
+            trigger.classList.remove('active');
+        });
+    }
+    
+    function handleOptionChange(selectElement) {
+        const checkboxes = selectElement.querySelectorAll('input[type="checkbox"]');
+        const selectText = selectElement.querySelector('.select-text');
+        const allCheckbox = selectElement.querySelector('input[type="checkbox"][id$="_all"]');
+        const otherCheckboxes = Array.from(checkboxes).filter(cb => cb !== allCheckbox);
         
-        if (allCheckbox.checked) {
-            // Desmarcar todas as outras opções
+        // Handle "All" option logic
+        if (allCheckbox && allCheckbox.checked) {
             otherCheckboxes.forEach(cb => cb.checked = false);
-            selectedFilters[filterType] = [];
+        } else if (otherCheckboxes.some(cb => cb.checked)) {
+            if (allCheckbox) allCheckbox.checked = false;
         }
         
-        updateSelectedText(filterType);
+        // Update display text
+        updateSelectText(selectElement);
+        
+        // Trigger dashboard update
         renderDashboard();
     }
-
-    // Função para lidar com mudanças nas opções
-    function handleOptionChange(filterType) {
-        const allCheckbox = document.getElementById(filterType + '_all');
-        const otherCheckboxes = document.querySelectorAll(`input[onchange="handleOptionChange('${filterType}')"]`);
-        const checkedBoxes = Array.from(otherCheckboxes).filter(cb => cb.checked);
+    
+    function updateSelectText(selectElement) {
+        const checkboxes = selectElement.querySelectorAll('input[type="checkbox"]');
+        const selectText = selectElement.querySelector('.select-text');
+        const allCheckbox = selectElement.querySelector('input[type="checkbox"][id$="_all"]');
         
-        if (checkedBoxes.length > 0) {
-            // Se alguma opção específica foi selecionada, desmarcar "Todos"
-            allCheckbox.checked = false;
-            selectedFilters[filterType] = checkedBoxes.map(cb => cb.value);
+        const checkedOptions = Array.from(checkboxes).filter(cb => cb.checked && cb !== allCheckbox);
+        
+        if (allCheckbox && allCheckbox.checked) {
+            selectText.textContent = allCheckbox.nextElementSibling.textContent;
+        } else if (checkedOptions.length === 0) {
+            selectText.textContent = allCheckbox ? allCheckbox.nextElementSibling.textContent : 'Nenhuma seleção';
+            if (allCheckbox) allCheckbox.checked = true;
+        } else if (checkedOptions.length === 1) {
+            selectText.textContent = checkedOptions[0].nextElementSibling.textContent;
         } else {
-            // Se nenhuma opção específica está selecionada, marcar "Todos"
-            allCheckbox.checked = true;
-            selectedFilters[filterType] = [];
-        }
-        
-        updateSelectedText(filterType);
-        renderDashboard();
-    }
-
-    // Função para atualizar o texto selecionado
-    function updateSelectedText(filterType) {
-        const selectedTextElement = document.getElementById(filterType + 'SelectedText');
-        const allCheckbox = document.getElementById(filterType + '_all');
-        
-        if (allCheckbox.checked || selectedFilters[filterType].length === 0) {
-            switch(filterType) {
-                case 'ubs':
-                    selectedTextElement.textContent = 'Todas as Unidades';
-                    break;
-                case 'vulnerability':
-                    selectedTextElement.textContent = 'Todos os Índices';
-                    break;
-                case 'ageGroup':
-                    selectedTextElement.textContent = 'Todas as Faixas';
-                    break;
-                case 'district':
-                    selectedTextElement.textContent = 'Todos os Distritos';
-                    break;
-            }
-        } else {
-            const count = selectedFilters[filterType].length;
-            if (count === 1) {
-                selectedTextElement.textContent = selectedFilters[filterType][0];
-            } else {
-                selectedTextElement.textContent = `${count} selecionados`;
-            }
+            selectText.textContent = `${checkedOptions.length} selecionados`;
         }
     }
-
-    // Função para limpar filtros
-    function clearFilters() {
-        // Resetar todas as seleções
-        selectedFilters = {
-            ubs: [],
-            vulnerability: [],
-            ageGroup: [],
-            district: []
-        };
+    
+    // Get selected values from custom select
+    function getSelectedValues(selectElement) {
+        const checkboxes = selectElement.querySelectorAll('input[type="checkbox"]');
+        const allCheckbox = selectElement.querySelector('input[type="checkbox"][id$="_all"]');
         
-        // Marcar todos os checkboxes "Todos" e desmarcar os outros
-        ['ubs', 'vulnerability', 'ageGroup', 'district'].forEach(filterType => {
-            document.getElementById(filterType + '_all').checked = true;
-            document.querySelectorAll(`input[onchange="handleOptionChange('${filterType}')"]`).forEach(cb => {
-                cb.checked = false;
-            });
-            updateSelectedText(filterType);
-        });
-        
-        // Fechar todos os dropdowns
-        document.querySelectorAll('.multi-select-dropdown').forEach(dd => {
-            dd.classList.remove('show');
-            dd.previousElementSibling.classList.remove('active');
-        });
-        
-        renderDashboard();
-    }
-
-    // Fechar dropdowns ao clicar fora
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.multi-select-container')) {
-            document.querySelectorAll('.multi-select-dropdown').forEach(dd => {
-                dd.classList.remove('show');
-                dd.previousElementSibling.classList.remove('active');
-            });
+        if (allCheckbox && allCheckbox.checked) {
+            return [];
         }
-    });
-
-    // Expor funções globalmente
-    window.toggleMultiSelect = toggleMultiSelect;
-    window.handleSelectAll = handleSelectAll;
-    window.handleOptionChange = handleOptionChange;
-    window.clearFilters = clearFilters;
+        
+        return Array.from(checkboxes)
+            .filter(cb => cb.checked && cb !== allCheckbox)
+            .map(cb => cb.closest('.select-option').dataset.value)
+            .filter(value => value !== "");
+    }
 
     // ===================================================================================
     // NOVOS DADOS DO CENSO 2021 POR DISTRITO E FAIXA ETÁRIA
@@ -285,52 +258,57 @@ document.addEventListener("DOMContentLoaded", function() {
     let charts = {};
 
     function renderDashboard() {
+        // Obter valores selecionados dos componentes customizados
+        const selectedUbsKeys = getSelectedValues(ubsFilter);
+        const selectedVulnerabilities = getSelectedValues(vulnerabilityFilter);
+        const selectedAgeGroups = getSelectedValues(ageGroupFilter);
+        const selectedDistricts = getSelectedValues(districtFilter);
+        
         const normalizeString = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase() : "";
         
-        // Aplicar filtros
         const tableData = {
             districtTableData: processedData.districtTableData,
             ubsTableData: processedData.ubsTableData.filter(ubs => {
-                if (selectedFilters.ubs.length > 0 && !selectedFilters.ubs.includes(ubs.ubs)) return false;
-                if (selectedFilters.vulnerability.length > 0 && !selectedFilters.vulnerability.includes(ubs.vulnerability)) return false;
+                if (selectedUbsKeys.length > 0 && !selectedUbsKeys.some(key => normalizeString(ubs.ubs) === normalizeString(key))) return false;
+                if (selectedVulnerabilities.length > 0 && !selectedVulnerabilities.includes(ubs.vulnerability)) return false;
                 return true;
             }),
             censusTableData: censusData2021.filter(row => {
-                return true; // Manter todos os dados do censo por enquanto
+                if (selectedDistricts.length > 0 && row.FAIXA_ETARIA !== "Total") {
+                    return true; // Mostrar todas as faixas etárias se um distrito específico for selecionado
+                }
+                return true;
             })
         };
 
         const chartData = {};
         const ubsLabels = processedData.ubsTableData.map(u => u.ubs);
         const filteredUbsIndices = ubsLabels.map((label, index) => {
-            const matchesUbs = selectedFilters.ubs.length === 0 || selectedFilters.ubs.includes(label);
-            return matchesUbs ? index : -1;
+            return (selectedUbsKeys.length === 0 || selectedUbsKeys.some(key => normalizeString(label) === normalizeString(key))) ? index : -1;
         }).filter(index => index !== -1);
 
         const ageGroupLabels = processedData.ageGroupData.labels;
+        const selectedAgeGroupIndices = selectedAgeGroups.length > 0 ? selectedAgeGroups.map(group => ageGroupLabels.indexOf(group)).filter(index => index !== -1) : [];
+        
         chartData.ageGroupData = {
-            labels: selectedFilters.ageGroup.length > 0 ? selectedFilters.ageGroup : ageGroupLabels,
+            labels: selectedAgeGroups.length > 0 ? selectedAgeGroups : ageGroupLabels,
             datasets: processedData.ageGroupData.datasets.filter((_, index) => filteredUbsIndices.includes(index))
-                .map(dataset => {
-                    if (selectedFilters.ageGroup.length > 0) {
-                        const filteredData = selectedFilters.ageGroup.map(ageGroup => {
-                            const ageIndex = ageGroupLabels.indexOf(ageGroup);
-                            return ageIndex !== -1 ? dataset.data[ageIndex] : 0;
-                        });
-                        return { ...dataset, data: filteredData };
-                    }
-                    return dataset;
-                })
+                .map(dataset => ({
+                    ...dataset,
+                    data: selectedAgeGroups.length > 0 ? selectedAgeGroupIndices.map(i => dataset.data[i]) : dataset.data
+                }))
         };
         
         const vulnerabilityLevels = processedData.vulnerabilityData.levels;
+        const selectedVulnerabilityIndices = selectedVulnerabilities.length > 0 ? selectedVulnerabilities.map(vuln => vulnerabilityLevels.indexOf(vuln)).filter(index => index !== -1) : [];
+        
         chartData.vulnerabilityData = {
             labels: ubsLabels.filter((_, index) => filteredUbsIndices.includes(index)),
             datasets: vulnerabilityLevels.map((level, i) => ({
                 label: level,
                 data: processedData.vulnerabilityData.datasets.map(d => d.data[i]).filter((_, ubsIndex) => filteredUbsIndices.includes(ubsIndex)),
                 backgroundColor: processedData.vulnerabilityData.colors[i]
-            })).filter(dataset => selectedFilters.vulnerability.length === 0 || selectedFilters.vulnerability.includes(dataset.label))
+            })).filter((_, levelIndex) => selectedVulnerabilities.length === 0 || selectedVulnerabilityIndices.includes(levelIndex))
         };
 
         chartData.ubsPopulationData = {
@@ -345,224 +323,207 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Novo gráfico do censo 2021
         chartData.districtCensusData = prepareCensusChartData();
-        if (selectedFilters.district.length > 0) {
+        if (selectedDistricts.length > 0) {
             chartData.districtCensusData.datasets = chartData.districtCensusData.datasets.filter(dataset => 
-                selectedFilters.district.includes(dataset.label.toUpperCase().replace(/\s+/g, '_'))
+                selectedDistricts.some(district => dataset.label.toUpperCase().replace(" ", "_") === district)
             );
         }
 
-        // Atualizar estatísticas
         updateStats(tableData);
-        
-        // Renderizar gráficos
-        renderCharts(chartData);
-        
-        // Renderizar tabelas
         renderTables(tableData);
+        renderCharts(chartData);
     }
 
     function updateStats(tableData) {
-        const filteredUbsCount = tableData.ubsTableData.length;
-        const filteredPopulation = tableData.ubsTableData.reduce((sum, ubs) => sum + ubs.population, 0);
-        
-        document.getElementById("eldoradoPopulation").textContent = filteredPopulation.toLocaleString('pt-BR');
+        const eldoradoPopulation = tableData.ubsTableData.reduce((sum, ubs) => sum + ubs.population, 0);
+        document.getElementById("eldoradoPopulation").textContent = eldoradoPopulation.toLocaleString("pt-BR");
         document.getElementById("totalPopulation").textContent = data.totalPopulation;
-        document.getElementById("totalUBS").textContent = filteredUbsCount.toString();
+        document.getElementById("totalUBS").textContent = tableData.ubsTableData.length;
         document.getElementById("totalDistricts").textContent = data.totalDistricts;
     }
 
-    function renderCharts(chartData) {
-        // Destruir gráficos existentes
-        Object.values(charts).forEach(chart => chart.destroy());
-        charts = {};
-
-        // Gráfico de Faixa Etária
-        const ageGroupCtx = document.getElementById("ageGroupChart").getContext("2d");
-        charts.ageGroup = new Chart(ageGroupCtx, {
-            type: "bar",
-            data: chartData.ageGroupData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    datalabels: { display: false }
-                },
-                scales: {
-                    x: { stacked: true },
-                    y: { stacked: true }
-                }
-            }
-        });
-
-        // Gráfico de Vulnerabilidade
-        const vulnerabilityCtx = document.getElementById("vulnerabilityChart").getContext("2d");
-        charts.vulnerability = new Chart(vulnerabilityCtx, {
-            type: "bar",
-            data: chartData.vulnerabilityData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    datalabels: { display: false }
-                },
-                scales: {
-                    x: { stacked: true },
-                    y: { stacked: true }
-                }
-            }
-        });
-
-        // Gráfico de População UBS
-        const ubsCtx = document.getElementById("ubsChart").getContext("2d");
-        charts.ubs = new Chart(ubsCtx, {
-            type: "bar",
-            data: chartData.ubsPopulationData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    datalabels: { display: false }
-                }
-            }
-        });
-
-        // Gráfico Histórico
-        const historicalCtx = document.getElementById("historicalChart").getContext("2d");
-        charts.historical = new Chart(historicalCtx, {
-            type: "bar",
-            data: chartData.historicalData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    datalabels: { display: false }
-                }
-            }
-        });
-
-        // Gráfico do Censo 2021
-        const districtCensusCtx = document.getElementById("districtCensusChart").getContext("2d");
-        charts.districtCensus = new Chart(districtCensusCtx, {
-            type: "bar",
-            data: chartData.districtCensusData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    datalabels: { display: false }
-                },
-                scales: {
-                    x: { stacked: true },
-                    y: { stacked: true }
-                }
-            }
-        });
-
-        // Renderizar legendas customizadas
-        renderCustomLegends(chartData);
-    }
-
-    function renderCustomLegends(chartData) {
-        // Legenda Faixa Etária
-        const ageGroupLegend = document.getElementById("ageGroupLegend");
-        ageGroupLegend.innerHTML = chartData.ageGroupData.datasets.map(dataset => 
-            `<span class="legend-item"><span class="legend-color" style="background-color: ${dataset.backgroundColor}"></span>${dataset.label}</span>`
-        ).join("");
-
-        // Legenda Vulnerabilidade
-        const vulnerabilityLegend = document.getElementById("vulnerabilityLegend");
-        vulnerabilityLegend.innerHTML = chartData.vulnerabilityData.datasets.map(dataset => 
-            `<span class="legend-item"><span class="legend-color" style="background-color: ${dataset.backgroundColor}"></span>${dataset.label}</span>`
-        ).join("");
-
-        // Legenda UBS
-        const ubsLegend = document.getElementById("ubsLegend");
-        ubsLegend.innerHTML = `<span class="legend-item"><span class="legend-color" style="background-color: #e74c3c"></span>População Cadastrada</span>`;
-
-        // Legenda Histórica
-        const historicalLegend = document.getElementById("historicalLegend");
-        historicalLegend.innerHTML = chartData.historicalData.datasets.map(dataset => 
-            `<span class="legend-item"><span class="legend-color" style="background-color: ${dataset.backgroundColor}"></span>${dataset.label}</span>`
-        ).join("");
-
-        // Legenda Censo 2021
-        const districtCensusLegend = document.getElementById("districtCensusLegend");
-        districtCensusLegend.innerHTML = chartData.districtCensusData.datasets.map(dataset => 
-            `<span class="legend-item"><span class="legend-color" style="background-color: ${dataset.backgroundColor}"></span>${dataset.label}</span>`
-        ).join("");
-    }
-
     function renderTables(tableData) {
-        // Tabela de Distritos
-        districtTableBody.innerHTML = tableData.districtTableData.map(row => `
-            <tr>
+        districtTableBody.innerHTML = "";
+        tableData.districtTableData.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
                 <td>${row.district}</td>
-                <td>${row.pop2010.toLocaleString('pt-BR')}</td>
-                <td>${row.pop2022.toLocaleString('pt-BR')}</td>
-                <td class="${row.growth.startsWith('+') ? 'growth-positive' : 'growth-negative'}">${row.growth}</td>
-                <td class="${row.growthPct.startsWith('+') ? 'growth-positive' : 'growth-negative'}">${row.growthPct}</td>
-            </tr>
-        `).join("");
+                <td>${row.pop2010.toLocaleString("pt-BR")}</td>
+                <td>${row.pop2022.toLocaleString("pt-BR")}</td>
+                <td class="${row.growth.includes('+') ? 'growth-positive' : 'growth-negative'}">${row.growth}</td>
+                <td class="${row.growthPct.includes('+') ? 'growth-positive' : 'growth-negative'}">${row.growthPct}</td>
+            `;
+            districtTableBody.appendChild(tr);
+        });
 
-        // Tabela UBS
-        ubsTableBody.innerHTML = tableData.ubsTableData.map(row => `
-            <tr>
+        ubsTableBody.innerHTML = "";
+        tableData.ubsTableData.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
                 <td>${row.ubs}</td>
-                <td>${row.population.toLocaleString('pt-BR')}</td>
+                <td>${row.population.toLocaleString("pt-BR")}</td>
                 <td>${row.vulnerability}</td>
                 <td>${row.ageGroup}</td>
                 <td><span class="badge badge-success">${row.status}</span></td>
-            </tr>
-        `).join("");
+            `;
+            ubsTableBody.appendChild(tr);
+        });
 
-        // Tabela do Censo 2021
-        censusTableBody.innerHTML = tableData.censusTableData.map(row => `
-            <tr>
-                <td>${row.FAIXA_ETARIA}</td>
-                <td>${row.ELDORADO.toLocaleString('pt-BR')}</td>
-                <td>${row.RESSACA.toLocaleString('pt-BR')}</td>
-                <td>${row.SEDE.toLocaleString('pt-BR')}</td>
-                <td>${row.INDUSTRIAL.toLocaleString('pt-BR')}</td>
-                <td>${row.RIACHO.toLocaleString('pt-BR')}</td>
-                <td>${row.NACIONAL.toLocaleString('pt-BR')}</td>
-                <td>${row.VARGEM_DAS_FLORES.toLocaleString('pt-BR')}</td>
-                <td>${row.PETROLANDIA.toLocaleString('pt-BR')}</td>
-                <td class="total-cell">${row.Total.toLocaleString('pt-BR')}</td>
-            </tr>
-        `).join("");
-    }
-
-    // Função para download Excel (placeholder)
-    function downloadExcel() {
-        alert("Funcionalidade de download Excel será implementada em breve!");
-    }
-
-    // Expor função globalmente
-    window.downloadExcel = downloadExcel;
-
-    // Busca na tabela do censo
-    if (censusTableSearch) {
-        censusTableSearch.addEventListener("input", function() {
-            const searchTerm = this.value.toLowerCase();
-            const rows = censusTableBody.querySelectorAll("tr");
+        // Renderizar tabela do censo 2021
+        censusTableBody.innerHTML = "";
+        tableData.censusTableData.forEach(row => {
+            const tr = document.createElement("tr");
+            const isTotal = row.FAIXA_ETARIA === "Total";
             
-            rows.forEach(row => {
-                const ageGroup = row.cells[0].textContent.toLowerCase();
-                if (ageGroup.includes(searchTerm)) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
+            tr.innerHTML = `
+                <td>${row.FAIXA_ETARIA}</td>
+                <td ${isTotal ? 'class="total-cell"' : ''}>${row.ELDORADO.toLocaleString("pt-BR")}</td>
+                <td ${isTotal ? 'class="total-cell"' : ''}>${row.RESSACA.toLocaleString("pt-BR")}</td>
+                <td ${isTotal ? 'class="total-cell"' : ''}>${row.SEDE.toLocaleString("pt-BR")}</td>
+                <td ${isTotal ? 'class="total-cell"' : ''}>${row.INDUSTRIAL.toLocaleString("pt-BR")}</td>
+                <td ${isTotal ? 'class="total-cell"' : ''}>${row.RIACHO.toLocaleString("pt-BR")}</td>
+                <td ${isTotal ? 'class="total-cell"' : ''}>${row.NACIONAL.toLocaleString("pt-BR")}</td>
+                <td ${isTotal ? 'class="total-cell"' : ''}>${row.VARGEM_DAS_FLORES.toLocaleString("pt-BR")}</td>
+                <td ${isTotal ? 'class="total-cell"' : ''}>${row.PETROLANDIA.toLocaleString("pt-BR")}</td>
+                <td class="total-cell">${row.Total.toLocaleString("pt-BR")}</td>
+            `;
+            
+            if (isTotal) {
+                tr.style.fontWeight = "bold";
+                tr.style.backgroundColor = "rgba(231, 76, 60, 0.1)";
+            }
+            
+            censusTableBody.appendChild(tr);
         });
     }
 
-    // Renderização inicial
+    function renderCharts(chartData) {
+        Object.values(charts).forEach(chart => { if(chart) chart.destroy(); });
+
+        const stackedBarOptions = {
+            responsive: true, maintainAspectRatio: false,
+            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+            plugins: { legend: { display: false }, tooltip: { enabled: true }, datalabels: { display: false } }
+        };
+
+        const historicalOptions = {
+            responsive: true, maintainAspectRatio: false,
+            indexAxis: 'y', // Esta linha faz o gráfico ficar horizontal
+            plugins: {
+                legend: { display: false }, tooltip: { enabled: false },
+                datalabels: {
+                    anchor: 'end', align: 'right', color: 'black', font: { weight: 'bold' },
+                    formatter: value => value.toLocaleString('pt-BR')
+                }
+            },
+            scales: {
+                x: { beginAtZero: true },
+                y: {}
+            }
+        };
+        
+        const ubsPopulationOptions = {
+            responsive: true, maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { display: false }, tooltip: { enabled: false },
+                datalabels: {
+                    anchor: 'center', align: 'center', color: 'white',
+                    font: { weight: 'bold', size: 14 },
+                    rotation: 0,
+                    formatter: value => value.toLocaleString('pt-BR')
+                }
+            }
+        };
+
+        // Novo gráfico do censo 2021
+        const censusChartOptions = {
+            responsive: true, maintainAspectRatio: false,
+            scales: { 
+                x: { 
+                    ticks: { maxRotation: 45, minRotation: 45 }
+                },
+                y: { beginAtZero: true }
+            },
+            plugins: {
+                legend: { display: false }, 
+                tooltip: { enabled: true },
+                datalabels: { display: false }
+            }
+        };
+
+        charts.ageGroup = new Chart(document.getElementById("ageGroupChart").getContext("2d"), { type: "bar", data: chartData.ageGroupData, options: stackedBarOptions });
+        charts.vulnerability = new Chart(document.getElementById("vulnerabilityChart").getContext("2d"), { type: "bar", data: chartData.vulnerabilityData, options: stackedBarOptions });
+        charts.ubsPopulation = new Chart(document.getElementById("ubsChart").getContext("2d"), { type: "bar", data: chartData.ubsPopulationData, options: ubsPopulationOptions });
+        charts.historical = new Chart(document.getElementById("historicalChart").getContext("2d"), { type: "bar", data: chartData.historicalData, options: historicalOptions });
+        charts.districtCensus = new Chart(document.getElementById("districtCensusChart").getContext("2d"), { type: "bar", data: chartData.districtCensusData, options: censusChartOptions });
+        
+        Object.keys(charts).forEach(key => updateCustomLegend(`${key}Legend`, charts[key]));
+    }
+
+    function updateCustomLegend(legendId, chart) {
+        const legendContainer = document.getElementById(legendId);
+        if (!legendContainer) return;
+        
+        legendContainer.innerHTML = "";
+        chart.data.datasets.forEach((dataset, index) => {
+            const legendItem = document.createElement("span");
+            legendItem.className = "legend-item";
+            legendItem.innerHTML = `
+                <span class="legend-color" style="background-color: ${dataset.backgroundColor}"></span>
+                ${dataset.label}
+            `;
+            legendContainer.appendChild(legendItem);
+        });
+    }
+
+    // ===================================================================================
+    // EVENTOS E INICIALIZAÇÃO
+    // ===================================================================================
+    
+    // Busca na tabela do censo
+    censusTableSearch.addEventListener("input", function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = censusTableBody.querySelectorAll("tr");
+        
+        rows.forEach(row => {
+            const firstCell = row.querySelector("td");
+            if (firstCell) {
+                const text = firstCell.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? "" : "none";
+            }
+        });
+    });
+
+    // Funções globais
+    window.clearFilters = function() {
+        // Limpar todas as seleções dos componentes customizados
+        document.querySelectorAll('.custom-select').forEach(select => {
+            const checkboxes = select.querySelectorAll('input[type="checkbox"]');
+            const allCheckbox = select.querySelector('input[type="checkbox"][id$="_all"]');
+            
+            // Desmarcar todos os checkboxes
+            checkboxes.forEach(cb => cb.checked = false);
+            
+            // Marcar apenas o "Todos"
+            if (allCheckbox) {
+                allCheckbox.checked = true;
+            }
+            
+            // Atualizar o texto exibido
+            updateSelectText(select);
+        });
+        
+        censusTableSearch.value = "";
+        renderDashboard();
+    };
+
+    window.downloadExcel = function() {
+        alert("Funcionalidade de download em desenvolvimento");
+    };
+
+    // Inicialização
+    initializeCustomSelects();
     renderDashboard();
 });
 
