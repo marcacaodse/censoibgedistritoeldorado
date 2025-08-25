@@ -33,174 +33,171 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div class="filter-group">
                     <label class="filter-label">Unidade de Saúde (Distrito Eldorado)</label>
-                    <div class="multi-select-container" id="ubsFilterContainer">
-                        <div class="multi-select-header" onclick="toggleMultiSelect('ubsFilter')">
-                            <span class="selected-text" id="ubsSelectedText">Todas as Unidades</span>
-                            <i class="fas fa-chevron-down"></i>
+                    <div class="custom-select" id="ubsFilter">
+                        <div class="select-trigger">
+                            <span class="select-text">Todas as Unidades</span>
+                            <i class="fas fa-chevron-down select-arrow"></i>
                         </div>
-                        <div class="multi-select-dropdown" id="ubsFilterDropdown">
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="ubs_all" value="" checked onchange="handleSelectAll('ubs')">
+                        <div class="select-dropdown">
+                            <div class="select-option" data-value="">
+                                <input type="checkbox" id="ubs_all" checked>
                                 <label for="ubs_all">Todas as Unidades</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="ubs_agua_branca" value="Água Branca" onchange="handleOptionChange('ubs')">
+                            <div class="select-option" data-value="Água Branca">
+                                <input type="checkbox" id="ubs_agua_branca">
                                 <label for="ubs_agua_branca">Água Branca</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="ubs_bela_vista" value="Bela Vista" onchange="handleOptionChange('ubs')">
+                            <div class="select-option" data-value="Bela Vista">
+                                <input type="checkbox" id="ubs_bela_vista">
                                 <label for="ubs_bela_vista">Bela Vista</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="ubs_csu_eldorado" value="CSU Eldorado" onchange="handleOptionChange('ubs')">
+                            <div class="select-option" data-value="CSU Eldorado">
+                                <input type="checkbox" id="ubs_csu_eldorado">
                                 <label for="ubs_csu_eldorado">CSU Eldorado</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="ubs_jardim_bandeirantes" value="Jardim Bandeirantes" onchange="handleOptionChange('ubs')">
+                            <div class="select-option" data-value="Jardim Bandeirantes">
+                                <input type="checkbox" id="ubs_jardim_bandeirantes">
                                 <label for="ubs_jardim_bandeirantes">Jardim Bandeirantes</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="ubs_jardim_eldorado" value="Jardim Eldorado" onchange="handleOptionChange('ubs')">
+                            <div class="select-option" data-value="Jardim Eldorado">
+                                <input type="checkbox" id="ubs_jardim_eldorado">
                                 <label for="ubs_jardim_eldorado">Jardim Eldorado</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="ubs_novo_eldorado" value="Novo Eldorado" onchange="handleOptionChange('ubs')">
+                            <div class="select-option" data-value="Novo Eldorado">
+                                <input type="checkbox" id="ubs_novo_eldorado">
                                 <label for="ubs_novo_eldorado">Novo Eldorado</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="ubs_parque_sao_joao" value="Parque São João" onchange="handleOptionChange('ubs')">
+                            <div class="select-option" data-value="Parque São João">
+                                <input type="checkbox" id="ubs_parque_sao_joao">
                                 <label for="ubs_parque_sao_joao">Parque São João</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="ubs_perobas" value="Perobas" onchange="handleOptionChange('ubs')">
+                            <div class="select-option" data-value="Perobas">
+                                <input type="checkbox" id="ubs_perobas">
                                 <label for="ubs_perobas">Perobas</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="ubs_santa_cruz" value="Santa Cruz" onchange="handleOptionChange('ubs')">
+                            <div class="select-option" data-value="Santa Cruz">
+                                <input type="checkbox" id="ubs_santa_cruz">
                                 <label for="ubs_santa_cruz">Santa Cruz</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="ubs_unidade_xv" value="Unidade XV" onchange="handleOptionChange('ubs')">
+                            <div class="select-option" data-value="Unidade XV">
+                                <input type="checkbox" id="ubs_unidade_xv">
                                 <label for="ubs_unidade_xv">Unidade XV</label>
                             </div>
                         </div>
                     </div>
                 </div>
-                
                 <div class="filter-group">
                     <label class="filter-label">Índice de Vulnerabilidade/2021</label>
-                    <div class="multi-select-container" id="vulnerabilityFilterContainer">
-                        <div class="multi-select-header" onclick="toggleMultiSelect('vulnerabilityFilter')">
-                            <span class="selected-text" id="vulnerabilitySelectedText">Todos os Índices</span>
-                            <i class="fas fa-chevron-down"></i>
+                    <div class="custom-select" id="vulnerabilityFilter">
+                        <div class="select-trigger">
+                            <span class="select-text">Todos os Índices</span>
+                            <i class="fas fa-chevron-down select-arrow"></i>
                         </div>
-                        <div class="multi-select-dropdown" id="vulnerabilityFilterDropdown">
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="vulnerability_all" value="" checked onchange="handleSelectAll('vulnerability')">
-                                <label for="vulnerability_all">Todos os Índices</label>
+                        <div class="select-dropdown">
+                            <div class="select-option" data-value="">
+                                <input type="checkbox" id="vuln_all" checked>
+                                <label for="vuln_all">Todos os Índices</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="vulnerability_baixa" value="Baixa" onchange="handleOptionChange('vulnerability')">
-                                <label for="vulnerability_baixa">Baixa</label>
+                            <div class="select-option" data-value="Baixa">
+                                <input type="checkbox" id="vuln_baixa">
+                                <label for="vuln_baixa">Baixa</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="vulnerability_media" value="Média" onchange="handleOptionChange('vulnerability')">
-                                <label for="vulnerability_media">Média</label>
+                            <div class="select-option" data-value="Média">
+                                <input type="checkbox" id="vuln_media">
+                                <label for="vuln_media">Média</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="vulnerability_elevada" value="Elevada" onchange="handleOptionChange('vulnerability')">
-                                <label for="vulnerability_elevada">Elevada</label>
+                            <div class="select-option" data-value="Elevada">
+                                <input type="checkbox" id="vuln_elevada">
+                                <label for="vuln_elevada">Elevada</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="vulnerability_muito_elevada" value="Muito Elevada" onchange="handleOptionChange('vulnerability')">
-                                <label for="vulnerability_muito_elevada">Muito Elevada</label>
+                            <div class="select-option" data-value="Muito Elevada">
+                                <input type="checkbox" id="vuln_muito_elevada">
+                                <label for="vuln_muito_elevada">Muito Elevada</label>
                             </div>
                         </div>
                     </div>
                 </div>
-                
                 <div class="filter-group">
                     <label class="filter-label">Faixa Etária Censo 2021</label>
-                    <div class="multi-select-container" id="ageGroupFilterContainer">
-                        <div class="multi-select-header" onclick="toggleMultiSelect('ageGroupFilter')">
-                            <span class="selected-text" id="ageGroupSelectedText">Todas as Faixas</span>
-                            <i class="fas fa-chevron-down"></i>
+                    <div class="custom-select" id="ageGroupFilter">
+                        <div class="select-trigger">
+                            <span class="select-text">Todas as Faixas</span>
+                            <i class="fas fa-chevron-down select-arrow"></i>
                         </div>
-                        <div class="multi-select-dropdown" id="ageGroupFilterDropdown">
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="age_all" value="" checked onchange="handleSelectAll('ageGroup')">
+                        <div class="select-dropdown">
+                            <div class="select-option" data-value="">
+                                <input type="checkbox" id="age_all" checked>
                                 <label for="age_all">Todas as Faixas</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="age_0_4" value="0 a 4 anos" onchange="handleOptionChange('ageGroup')">
+                            <div class="select-option" data-value="0 a 4 anos">
+                                <input type="checkbox" id="age_0_4">
                                 <label for="age_0_4">0 a 4 anos</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="age_5_11" value="5 a 11 anos" onchange="handleOptionChange('ageGroup')">
+                            <div class="select-option" data-value="5 a 11 anos">
+                                <input type="checkbox" id="age_5_11">
                                 <label for="age_5_11">5 a 11 anos</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="age_12_17" value="12 a 17 anos" onchange="handleOptionChange('ageGroup')">
+                            <div class="select-option" data-value="12 a 17 anos">
+                                <input type="checkbox" id="age_12_17">
                                 <label for="age_12_17">12 a 17 anos</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="age_18_29" value="18 a 29 anos" onchange="handleOptionChange('ageGroup')">
+                            <div class="select-option" data-value="18 a 29 anos">
+                                <input type="checkbox" id="age_18_29">
                                 <label for="age_18_29">18 a 29 anos</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="age_30_59" value="30 a 59 anos" onchange="handleOptionChange('ageGroup')">
+                            <div class="select-option" data-value="30 a 59 anos">
+                                <input type="checkbox" id="age_30_59">
                                 <label for="age_30_59">30 a 59 anos</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="age_60_plus" value="60 anos ou mais" onchange="handleOptionChange('ageGroup')">
+                            <div class="select-option" data-value="60 anos ou mais">
+                                <input type="checkbox" id="age_60_plus">
                                 <label for="age_60_plus">60 anos ou mais</label>
                             </div>
                         </div>
                     </div>
                 </div>
-                
                 <div class="filter-group">
                     <label class="filter-label">Distrito</label>
-                    <div class="multi-select-container" id="districtFilterContainer">
-                        <div class="multi-select-header" onclick="toggleMultiSelect('districtFilter')">
-                            <span class="selected-text" id="districtSelectedText">Todos os Distritos</span>
-                            <i class="fas fa-chevron-down"></i>
+                    <div class="custom-select" id="districtFilter">
+                        <div class="select-trigger">
+                            <span class="select-text">Todos os Distritos</span>
+                            <i class="fas fa-chevron-down select-arrow"></i>
                         </div>
-                        <div class="multi-select-dropdown" id="districtFilterDropdown">
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="district_all" value="" checked onchange="handleSelectAll('district')">
+                        <div class="select-dropdown">
+                            <div class="select-option" data-value="">
+                                <input type="checkbox" id="district_all" checked>
                                 <label for="district_all">Todos os Distritos</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="district_eldorado" value="ELDORADO" onchange="handleOptionChange('district')">
+                            <div class="select-option" data-value="ELDORADO">
+                                <input type="checkbox" id="district_eldorado">
                                 <label for="district_eldorado">Eldorado</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="district_ressaca" value="RESSACA" onchange="handleOptionChange('district')">
+                            <div class="select-option" data-value="RESSACA">
+                                <input type="checkbox" id="district_ressaca">
                                 <label for="district_ressaca">Ressaca</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="district_sede" value="SEDE" onchange="handleOptionChange('district')">
+                            <div class="select-option" data-value="SEDE">
+                                <input type="checkbox" id="district_sede">
                                 <label for="district_sede">Sede</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="district_industrial" value="INDUSTRIAL" onchange="handleOptionChange('district')">
+                            <div class="select-option" data-value="INDUSTRIAL">
+                                <input type="checkbox" id="district_industrial">
                                 <label for="district_industrial">Industrial</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="district_riacho" value="RIACHO" onchange="handleOptionChange('district')">
+                            <div class="select-option" data-value="RIACHO">
+                                <input type="checkbox" id="district_riacho">
                                 <label for="district_riacho">Riacho</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="district_nacional" value="NACIONAL" onchange="handleOptionChange('district')">
+                            <div class="select-option" data-value="NACIONAL">
+                                <input type="checkbox" id="district_nacional">
                                 <label for="district_nacional">Nacional</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="district_vargem" value="VARGEM_DAS_FLORES" onchange="handleOptionChange('district')">
+                            <div class="select-option" data-value="VARGEM_DAS_FLORES">
+                                <input type="checkbox" id="district_vargem">
                                 <label for="district_vargem">Vargem das Flores</label>
                             </div>
-                            <div class="multi-select-option">
-                                <input type="checkbox" id="district_petrolandia" value="PETROLANDIA" onchange="handleOptionChange('district')">
+                            <div class="select-option" data-value="PETROLANDIA">
+                                <input type="checkbox" id="district_petrolandia">
                                 <label for="district_petrolandia">Petrolândia</label>
                             </div>
                         </div>
