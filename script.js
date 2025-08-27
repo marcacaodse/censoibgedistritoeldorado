@@ -437,8 +437,14 @@ document.addEventListener("DOMContentLoaded", function() {
         };
 
         // Renderizar Gráficos
-        if (charts.ageGroupChart) charts.ageGroupChart.destroy();
-        charts.ageGroupChart = new Chart(document.getElementById("ageGroupChart"), {
+        const renderChart = (chartInstance, elementId, chartConfig, legendId) => {
+            if (chartInstance) chartInstance.destroy();
+            const chart = new Chart(document.getElementById(elementId), chartConfig);
+            updateLegend(chart, legendId);
+            return chart;
+        };
+
+        charts.ageGroupChart = renderChart(charts.ageGroupChart, "ageGroupChart", {
             type: "bar",
             data: chartData.ageGroupData,
             options: {
@@ -461,11 +467,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             },
             plugins: [ChartDataLabels]
-        });
-        updateLegend(charts.ageGroupChart, "ageGroupLegend");
+        }, "ageGroupLegend");
 
-        if (charts.vulnerabilityChart) charts.vulnerabilityChart.destroy();
-        charts.vulnerabilityChart = new Chart(document.getElementById("vulnerabilityChart"), {
+        charts.vulnerabilityChart = renderChart(charts.vulnerabilityChart, "vulnerabilityChart", {
             type: "bar",
             data: chartData.vulnerabilityData,
             options: {
@@ -488,11 +492,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             },
             plugins: [ChartDataLabels]
-        });
-        updateLegend(charts.vulnerabilityChart, "vulnerabilityLegend");
+        }, "vulnerabilityLegend");
 
-        if (charts.ubsChart) charts.ubsChart.destroy();
-        charts.ubsChart = new Chart(document.getElementById("ubsChart"), {
+        charts.ubsChart = renderChart(charts.ubsChart, "ubsChart", {
             type: "bar",
             data: chartData.ubsPopulationData,
             options: {
@@ -515,11 +517,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             },
             plugins: [ChartDataLabels]
-        });
-        updateLegend(charts.ubsChart, "ubsLegend");
+        }, "ubsLegend");
 
-        if (charts.historicalChart) charts.historicalChart.destroy();
-        charts.historicalChart = new Chart(document.getElementById("historicalChart"), {
+        charts.historicalChart = renderChart(charts.historicalChart, "historicalChart", {
             type: "bar",
             data: chartData.historicalData,
             options: {
@@ -542,12 +542,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             },
             plugins: [ChartDataLabels]
-        });
-        updateLegend(charts.historicalChart, "historicalLegend");
+        }, "historicalLegend");
 
-        // Novo gráfico do Censo 2021
-        if (charts.districtCensusChart) charts.districtCensusChart.destroy();
-        charts.districtCensusChart = new Chart(document.getElementById("districtCensusChart"), {
+        charts.districtCensusChart = renderChart(charts.districtCensusChart, "districtCensusChart", {
             type: "bar",
             data: chartData.districtCensusData,
             options: {
@@ -570,12 +567,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             },
             plugins: [ChartDataLabels]
-        });
-        updateLegend(charts.districtCensusChart, "districtCensusLegend");
+        }, "districtCensusLegend");
 
-        // NOVO GRÁFICO: Bolsa Família
-        if (charts.bolsaFamiliaChart) charts.bolsaFamiliaChart.destroy();
-        charts.bolsaFamiliaChart = new Chart(document.getElementById("bolsaFamiliaChart"), {
+        charts.bolsaFamiliaChart = renderChart(charts.bolsaFamiliaChart, "bolsaFamiliaChart", {
             type: "bar",
             data: chartData.bolsaFamiliaData,
             options: {
@@ -598,8 +592,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             },
             plugins: [ChartDataLabels]
-        });
-        updateLegend(charts.bolsaFamiliaChart, "bolsaFamiliaLegend");
+        }, "bolsaFamiliaLegend");
 
         // Atualizar tabelas
         updateDistrictTable(tableData.districtTableData);
