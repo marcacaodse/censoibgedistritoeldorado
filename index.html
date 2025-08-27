@@ -32,7 +32,21 @@
             <h3 class="mb-4"><i class="fas fa-filter"></i> Filtros de Dados</h3>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div class="filter-group">
-                    <label class="filter-label">Unidade de Saúde (Distrito Eldorado)</label>
+                    <label class="filter-label">Distrito</label>
+                    <select class="filter-select" id="districtFilter">
+                        <option value="">Todos os Distritos</option>
+                        <option value="ELDORADO">Eldorado</option>
+                        <option value="RESSACA">Ressaca</option>
+                        <option value="SEDE">Sede</option>
+                        <option value="INDUSTRIAL">Industrial</option>
+                        <option value="RIACHO">Riacho</option>
+                        <option value="NACIONAL">Nacional</option>
+                        <option value="VARGEM_DAS_FLORES">Vargem das Flores</option>
+                        <option value="PETROLANDIA">Petrolândia</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Unidades de Saúde (Distrito Eldorado)</label>
                     <select class="filter-select" id="ubsFilter">
                         <option value="">Todas as Unidades</option>
                         <option value="Água Branca">Água Branca</option>
@@ -67,20 +81,6 @@
                         <option value="18 a 29 anos">18 a 29 anos</option>
                         <option value="30 a 59 anos">30 a 59 anos</option>
                         <option value="60 anos ou mais">60 anos ou mais</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Distrito</label>
-                    <select class="filter-select" id="districtFilter">
-                        <option value="">Todos os Distritos</option>
-                        <option value="ELDORADO">Eldorado</option>
-                        <option value="RESSACA">Ressaca</option>
-                        <option value="SEDE">Sede</option>
-                        <option value="INDUSTRIAL">Industrial</option>
-                        <option value="RIACHO">Riacho</option>
-                        <option value="NACIONAL">Nacional</option>
-                        <option value="VARGEM_DAS_FLORES">Vargem das Flores</option>
-                        <option value="PETROLANDIA">Petrolândia</option>
                     </select>
                 </div>
             </div>
