@@ -14,20 +14,10 @@
     <div class="dashboard-container">
         <!-- Header -->
         <div class="header-section">
-            <div class="header-buttons">
-                <a href="https://app.powerbi.com/view?r=eyJrIjoiZTlkOWNhODEtNmU3Ny00OWJiLTkxOGYtM2Q4YzEwZjRlNTRkIiwidCI6ImFlODYzMzdlLTU3NWUtNDMzMC05NDc2LTkzZGU2ODJiMDAyMCJ9" 
-                   class="btn-power-bi" target="_blank">
-                    <i class="fas fa-chart-line"></i> Relatórios Detalhado BI
-                </a>
-                <a href="https://censo2022.ibge.gov.br/panorama/indicadores.html" 
-                   class="btn-power-bi" target="_blank">
-                    <i class="fas fa-users"></i> Censo IBGE 2022
-                </a>
-                <a href="https://cidades.ibge.gov.br/brasil/mg/contagem/panorama" 
-                   class="btn-power-bi" target="_blank">
-                    <i class="fas fa-city"></i> Contagem Censo IBGE 2022
-                </a>
-            </div>
+            <a href="https://app.powerbi.com/view?r=eyJrIjoiZTlkOWNhODEtNmU3Ny00OWJiLTkxOGYtM2Q4YzEwZjRlNTRkIiwidCI6ImFlODYzMzdlLTU3NWUtNDMzMC05NDc2LTkzZGU2ODJiMDAyMCJ9" 
+               class="btn-power-bi" target="_blank">
+                <i class="fas fa-chart-line"></i> Relatórios Detalhado BI
+            </a>
             <div class="header-content">
                 <h1 class="main-title">Censo IBGE</h1>
                 <p class="subtitle">População de Contagem MG - Distrito Sanitário Eldorado</p>
@@ -42,7 +32,7 @@
             <h3 class="mb-4"><i class="fas fa-filter"></i> Filtros de Dados</h3>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div class="filter-group">
-                    <label class="filter-label">Distritos:</label>
+                    <label class="filter-label">Distrito</label>
                     <select class="filter-select" id="districtFilter">
                         <option value="">Todos os Distritos</option>
                         <option value="ELDORADO">Eldorado</option>
@@ -56,7 +46,7 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Unidades de Saúde (Distrito Eldorado):</label>
+                    <label class="filter-label">Unidades de Saúde (Distrito Eldorado)</label>
                     <select class="filter-select" id="ubsFilter">
                         <option value="">Todas as Unidades</option>
                         <option value="Água Branca">Água Branca</option>
@@ -72,7 +62,7 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Índice de Vulnerabilidade/2021:</label>
+                    <label class="filter-label">Índice de Vulnerabilidade/2021</label>
                     <select class="filter-select" id="vulnerabilityFilter">
                         <option value="">Todos os Índices</option>
                         <option value="Baixa">Baixa</option>
@@ -82,7 +72,7 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Faixa Etária Censo 2021:</label>
+                    <label class="filter-label">Faixa Etária Censo 2021</label>
                     <select class="filter-select" id="ageGroupFilter">
                         <option value="">Todas as Faixas</option>
                         <option value="0 a 4 anos">0 a 4 anos</option>
@@ -108,7 +98,7 @@
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card">
                 <div class="stat-number" id="eldoradoPopulation">...</div>
-                <div class="stat-label">Pop. Distrito Sanitário Eldorado/2022 (Filtro Unidade)</div>
+                <div class="stat-label">Pop. Distrito Eldorado/2022 (Filtro Unidade)</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalPopulation">...</div>
@@ -116,25 +106,25 @@
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalUBS">...</div>
-                <div class="stat-label">Quantidade Unidades de Saúde no Distrito</div>
+                <div class="stat-label">Unidades no Distrito</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalDistricts">...</div>
-                <div class="stat-label">Quantidade - Distritos Sanitários no Munícipio</div>
+                <div class="stat-label">Distritos</div>
             </div>
         </div>
 
         <!-- Gráficos -->
         <div class="charts-grid">
             <div class="chart-container">
-                <div class="chart-title">População por Faixa Etária -Unidades Distrito Eldorado (2021)</div>
+                <div class="chart-title">População por Faixa Etária (2021)</div>
                 <div class="chart-wrapper">
                     <canvas id="ageGroupChart"></canvas>
                 </div>
                 <div class="custom-legend" id="ageGroupLegend"></div>
             </div>
             <div class="chart-container">
-                <div class="chart-title">Vulnerabilidade por Unidade - Unidades Distrito Eldorado (2021)</div>
+                <div class="chart-title">Vulnerabilidade por Unidade (2021)</div>
                 <div class="chart-wrapper">
                     <canvas id="vulnerabilityChart"></canvas>
                 </div>
@@ -156,19 +146,6 @@
                     <canvas id="historicalChart"></canvas>
                 </div>
                 <div class="custom-legend" id="historicalLegend"></div>
-            </div>
-        </div>
-
-        <div class="charts-grid">
-            <div class="chart-container">
-                <div class="chart-title">Bolsa Família - Cadastro - Unidades Distrito Sanitário Eldorado</div>
-                <div class="chart-wrapper">
-                    <canvas id="bolsaFamiliaChart"></canvas>
-                </div>
-                <div class="custom-legend" id="bolsaFamiliaLegend"></div>
-            </div>
-            <div class="chart-container">
-                <!-- Espaço reservado para futuro gráfico -->
             </div>
         </div>
 
@@ -269,4 +246,3 @@
     <script src="./script.js"></script>
 </body>
 </html>
-
