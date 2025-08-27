@@ -103,6 +103,18 @@ document.addEventListener("DOMContentLoaded", function() {
             { ubs: "Perobas", population: 5983, vulnerability: "Média", ageGroup: "60+ anos", status: "Ativa" },
             { ubs: "Santa Cruz", population: 11627, vulnerability: "Baixa", ageGroup: "12-17 anos", status: "Ativa" },
             { ubs: "Unidade XV", population: 22126, vulnerability: "Elevada", ageGroup: "30-59 anos", status: "Ativa" }
+        ],
+        bolsaFamiliaData: [
+            { ubs: "Água Branca", cadastros: 1214 },
+            { ubs: "Bela Vista", cadastros: 529 },
+            { ubs: "CSU Eldorado", cadastros: 1371 },
+            { ubs: "Jardim Bandeirantes", cadastros: 970 },
+            { ubs: "Jardim Eldorado", cadastros: 677 },
+            { ubs: "Novo Eldorado", cadastros: 1491 },
+            { ubs: "Parque São João", cadastros: 1478 },
+            { ubs: "Perobas", cadastros: 846 },
+            { ubs: "Santa Cruz", cadastros: 11 },
+            { ubs: "Unidade XV", cadastros: 795 }
         ]
     };
 
@@ -125,6 +137,14 @@ document.addEventListener("DOMContentLoaded", function() {
             label: "População Cadastrada", 
             data: processedData.ubsTableData.map(d => d.population), 
             backgroundColor: "#e74c3c"
+        }]
+    };
+    processedData.bolsaFamiliaChartData = {
+        labels: processedData.bolsaFamiliaData.map(d => d.ubs),
+        datasets: [{ 
+            label: "Cadastros Bolsa Família", 
+            data: processedData.bolsaFamiliaData.map(d => d.cadastros), 
+            backgroundColor: "#1e3a8a"
         }]
     };
 
@@ -206,6 +226,17 @@ document.addEventListener("DOMContentLoaded", function() {
                 backgroundColor: "#e74c3c"
             }]
         };
+        
+        // Novo gráfico do Bolsa Família
+        chartData.bolsaFamiliaChartData = {
+            labels: ubsLabels.filter((_, index) => filteredUbsIndices.includes(index)),
+            datasets: [{
+                label: "Cadastros Bolsa Família",
+                data: processedData.bolsaFamiliaChartData.datasets[0].data.filter((_, index) => filteredUbsIndices.includes(index)),
+                backgroundColor: "#1e3a8a"
+            }]
+        };
+        
         chartData.historicalData = processedData.historicalData;
 
         // Novo gráfico do censo 2021
@@ -339,10 +370,33 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         };
 
+        // Opções para o gráfico do Bolsa Família
+        const bolsaFamiliaOptions = {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }, 
+                tooltip: { enabled: false },
+                datalabels: {
+                    anchor: 'end', 
+                    align: 'top', 
+                    color: 'black',
+                    font: { weight: 'bold', size: 12 },
+                    formatter: value => value.toLocaleString('pt-BR')
+                }
+            },
+            scales: {
+                x: { 
+                    ticks: { maxRotation: 45, minRotation: 45 }
+                },
+                y: { beginAtZero: true }
+            }
+        };
+
         charts.ageGroup = new Chart(document.getElementById("ageGroupChart").getContext("2d"), { type: "bar", data: chartData.ageGroupData, options: stackedBarOptions });
         charts.vulnerability = new Chart(document.getElementById("vulnerabilityChart").getContext("2d"), { type: "bar", data: chartData.vulnerabilityData, options: stackedBarOptions });
         charts.ubsPopulation = new Chart(document.getElementById("ubsChart").getContext("2d"), { type: "bar", data: chartData.ubsPopulationData, options: ubsPopulationOptions });
         charts.historical = new Chart(document.getElementById("historicalChart").getContext("2d"), { type: "bar", data: chartData.historicalData, options: historicalOptions });
+        charts.bolsaFamilia = new Chart(document.getElementById("bolsaFamiliaChart").getContext("2d"), { type: "bar", data: chartData.bolsaFamiliaChartData, options: bolsaFamiliaOptions });
         charts.districtCensus = new Chart(document.getElementById("districtCensusChart").getContext("2d"), { type: "bar", data: chartData.districtCensusData, options: censusChartOptions });
         
         Object.keys(charts).forEach(key => updateCustomLegend(`${key}Legend`, charts[key]));
