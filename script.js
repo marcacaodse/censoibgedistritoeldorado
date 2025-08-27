@@ -347,7 +347,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 legend: { display: false }, tooltip: { enabled: false },
                 datalabels: {
                     anchor: 'center', align: 'center', color: 'white',
-                    font: { weight: 'bold', size: 14 },
+                    font: { weight: 'bold', size: 15 },
                     rotation: 0,
                     formatter: value => value.toLocaleString('pt-BR')
                 }
@@ -380,7 +380,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     anchor: 'end', 
                     align: 'top', 
                     color: 'black',
-                    font: { weight: 'bold', size: 12 },
+                    font: { weight: 'bold', size: 15 },
                     formatter: value => value.toLocaleString('pt-BR')
                 }
             },
