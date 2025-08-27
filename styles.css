@@ -57,16 +57,6 @@ body {
     z-index: 2;
 }
 
-.header-buttons {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 3;
-}
-
 .main-title {
     font-size: 2.2rem;
     font-weight: bold;
@@ -88,6 +78,9 @@ body {
 }
 
 .btn-power-bi {
+    position: absolute;
+    top: 20px;
+    right: 20px;
     background: rgba(255,255,255,0.2);
     border: 2px solid rgba(255,255,255,0.3);
     color: white;
@@ -95,13 +88,8 @@ body {
     border-radius: 20px;
     text-decoration: none;
     transition: all 0.3s ease;
+    z-index: 3;
     font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-    min-width: 200px;
-    justify-content: center;
 }
 
 .btn-power-bi:hover {
@@ -463,16 +451,6 @@ body {
     .charts-grid {
         grid-template-columns: 1fr;
     }
-    
-    .header-buttons {
-        position: relative;
-        top: auto;
-        right: auto;
-        flex-direction: row;
-        flex-wrap: wrap;
-        margin-bottom: 20px;
-        justify-content: center;
-    }
 }
 
 @media (max-width: 768px) {
@@ -485,19 +463,12 @@ body {
         margin: 10px;
     }
     
-    .header-buttons {
+    .btn-power-bi {
         position: relative;
         top: auto;
         right: auto;
-        flex-direction: column;
-        margin-bottom: 20px;
-        align-items: center;
-    }
-    
-    .btn-power-bi {
-        min-width: auto;
-        width: 100%;
-        max-width: 250px;
+        margin-bottom: 15px;
+        display: inline-block;
     }
     
     .table-wrapper {
