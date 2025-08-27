@@ -42,7 +42,7 @@
             <h3 class="mb-4"><i class="fas fa-filter"></i> Filtros de Dados</h3>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div class="filter-group">
-                    <label class="filter-label">Distrito</label>
+                    <label class="filter-label">Distritos:</label>
                     <select class="filter-select" id="districtFilter">
                         <option value="">Todos os Distritos</option>
                         <option value="ELDORADO">Eldorado</option>
@@ -56,7 +56,7 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Unidades de Saúde (Distrito Eldorado)</label>
+                    <label class="filter-label">Unidades de Saúde (Distrito Eldorado):</label>
                     <select class="filter-select" id="ubsFilter">
                         <option value="">Todas as Unidades</option>
                         <option value="Água Branca">Água Branca</option>
@@ -72,7 +72,7 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Índice de Vulnerabilidade/2021</label>
+                    <label class="filter-label">Índice de Vulnerabilidade/2021:</label>
                     <select class="filter-select" id="vulnerabilityFilter">
                         <option value="">Todos os Índices</option>
                         <option value="Baixa">Baixa</option>
@@ -82,7 +82,7 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Faixa Etária Censo 2021</label>
+                    <label class="filter-label">Faixa Etária Censo 2021:</label>
                     <select class="filter-select" id="ageGroupFilter">
                         <option value="">Todas as Faixas</option>
                         <option value="0 a 4 anos">0 a 4 anos</option>
@@ -108,7 +108,7 @@
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card">
                 <div class="stat-number" id="eldoradoPopulation">...</div>
-                <div class="stat-label">Pop. Distrito Sanitário Eldorado/2022 (Valor do Filtro por Unidade)</div>
+                <div class="stat-label">Pop. Distrito Sanitário Eldorado/2022 (Filtro por Unidade)</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalPopulation">...</div>
@@ -116,25 +116,25 @@
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalUBS">...</div>
-                <div class="stat-label"> Total - Unidade Básicas de Saúde no Distrito</div>
+                <div class="stat-label"> Total - Unidade Básicas de Saúde no Distrito Sanitário</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalDistricts">...</div>
-                <div class="stat-label">Valor Total de Distritos no Munícipio</div>
+                <div class="stat-label">Total de Distritos no Munícipio</div>
             </div>
         </div>
 
         <!-- Gráficos -->
         <div class="charts-grid">
             <div class="chart-container">
-                <div class="chart-title">População por Faixa Etária de idade (2021) Distrito Sanitário Eldorado</div>
+                <div class="chart-title">População por Faixa Etária de idade (2021)/ Distrito Sanitário Eldorado</div>
                 <div class="chart-wrapper">
                     <canvas id="ageGroupChart"></canvas>
                 </div>
                 <div class="custom-legend" id="ageGroupLegend"></div>
             </div>
             <div class="chart-container">
-                <div class="chart-title">Vulnerabilidade por Unidade Básica de Saúde (2021) Distrito Sanitário Eldorado</div>
+                <div class="chart-title">Vulnerabilidade por Unidade Básica de Saúde (2021)/ Distrito Sanitário Eldorado</div>
                 <div class="chart-wrapper">
                     <canvas id="vulnerabilityChart"></canvas>
                 </div>
@@ -144,14 +144,14 @@
 
         <div class="charts-grid">
             <div class="chart-container">
-                <div class="chart-title">População por Unidade de Saúde (2022) Distrito Sanitário Eldorado</div>
+                <div class="chart-title">População por Unidade de Saúde (2022)/ Distrito Sanitário Eldorado</div>
                 <div class="chart-wrapper">
                     <canvas id="ubsChart"></canvas>
                 </div>
                 <div class="custom-legend" id="ubsLegend"></div>
             </div>
             <div class="chart-container">
-                <div class="chart-title">População por Distrito (2010 vs 2022)</div>
+                <div class="chart-title">População por Distrito Sanitário da Saúde (2010 vs 2022)</div>
                 <div class="chart-wrapper">
                     <canvas id="historicalChart"></canvas>
                 </div>
@@ -159,7 +159,7 @@
             </div>
         </div>
 
-        <!-- NOVO GRÁFICO: Bolsa Família - Cadastro -Unidades Básicas de Saúde Distrito Sanitário Eldorado -->
+        <!-- NOVO GRÁFICO: Bolsa Família - Cadastros/Unidades Básicas de Saúde/ Distrito Sanitário Eldorado -->
         <div class="charts-grid">
             <div class="chart-container chart-full-width">
                 <div class="chart-title">Bolsa Família - Cadastro -Unidades Distrito Sanitário Eldorado</div>
