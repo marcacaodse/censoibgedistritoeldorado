@@ -404,3 +404,318 @@ document.addEventListener("DOMContentLoaded", function() {
     renderDashboard();
 });
 
+
+
+    // ===================================================================================
+    // NOVOS DADOS DO BOLSA FAMÍLIA
+    // ===================================================================================
+    const bolsaFamiliaData = [
+        { ubs: "Água Branca", value: 1214 },
+        { ubs: "Bela Vista", value: 529 },
+        { ubs: "CSU Eldorado", value: 1371 },
+        { ubs: "Jardim Bandeirantes", value: 970 },
+        { ubs: "Jardim Eldorado", value: 677 },
+        { ubs: "Novo Eldorado", value: 1491 },
+        { ubs: "Parque São João", value: 1478 },
+        { ubs: "Perobas", value: 846 },
+        { ubs: "Santa Cruz", value: 11 },
+        { ubs: "Unidade XV", value: 795 }
+    ];
+
+
+
+
+        chartData.bolsaFamiliaData = {
+            labels: ubsLabels.filter((_, index) => filteredUbsIndices.includes(index)),
+            datasets: [{
+                label: "Cadastro Bolsa Família",
+                data: bolsaFamiliaData.filter((_, index) => filteredUbsIndices.includes(index)).map(d => d.value),
+                backgroundColor: "#00008B", // Azul escuro
+                borderColor: "#00008B",
+                borderWidth: 1
+            }]
+        };
+
+        // Renderizar Gráficos
+        const renderChart = (chartInstance, elementId, chartConfig, legendId) => {
+            if (chartInstance) chartInstance.destroy();
+            const chart = new Chart(document.getElementById(elementId), chartConfig);
+            updateLegend(chart, legendId);
+            return chart;
+        };
+
+        charts.ageGroupChart = renderChart(charts.ageGroupChart, "ageGroupChart", {
+            type: "bar",
+            data: chartData.ageGroupData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: false },
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: "end",
+                        align: "top",
+                        formatter: (value) => value.toLocaleString(),
+                        color: "#000",
+                        font: { weight: "bold" }
+                    }
+                },
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true }
+                }
+            },
+            plugins: [ChartDataLabels]
+        }, "ageGroupLegend");
+
+        charts.vulnerabilityChart = renderChart(charts.vulnerabilityChart, "vulnerabilityChart", {
+            type: "bar",
+            data: chartData.vulnerabilityData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: false },
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: "end",
+                        align: "top",
+                        formatter: (value) => value.toLocaleString(),
+                        color: "#000",
+                        font: { weight: "bold" }
+                    }
+                },
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true }
+                }
+            },
+            plugins: [ChartDataLabels]
+        }, "vulnerabilityLegend");
+
+        charts.ubsChart = renderChart(charts.ubsChart, "ubsChart", {
+            type: "bar",
+            data: chartData.ubsPopulationData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: false },
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: "end",
+                        align: "top",
+                        formatter: (value) => value.toLocaleString(),
+                        color: "#000",
+                        font: { weight: "bold" }
+                    }
+                },
+                scales: {
+                    x: { beginAtZero: true },
+                    y: { beginAtZero: true }
+                }
+            },
+            plugins: [ChartDataLabels]
+        }, "ubsLegend");
+
+        charts.historicalChart = renderChart(charts.historicalChart, "historicalChart", {
+            type: "bar",
+            data: chartData.historicalData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: false },
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: "end",
+                        align: "top",
+                        formatter: (value) => value.toLocaleString(),
+                        color: "#000",
+                        font: { weight: "bold" }
+                    }
+                },
+                scales: {
+                    x: { beginAtZero: true },
+                    y: { beginAtZero: true }
+                }
+            },
+            plugins: [ChartDataLabels]
+        }, "historicalLegend");
+
+        charts.districtCensusChart = renderChart(charts.districtCensusChart, "districtCensusChart", {
+            type: "bar",
+            data: chartData.districtCensusData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: false },
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: "end",
+                        align: "top",
+                        formatter: (value) => value.toLocaleString(),
+                        color: "#000",
+                        font: { weight: "bold" }
+                    }
+                },
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true }
+                }
+            },
+            plugins: [ChartDataLabels]
+        }, "districtCensusLegend");
+
+        charts.bolsaFamiliaChart = renderChart(charts.bolsaFamiliaChart, "bolsaFamiliaChart", {
+            type: "bar",
+            data: chartData.bolsaFamiliaData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: false },
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: "end",
+                        align: "top",
+                        formatter: (value) => value.toLocaleString(),
+                        color: "#000",
+                        font: { weight: "bold" }
+                    }
+                },
+                scales: {
+                    x: { beginAtZero: true },
+                    y: { beginAtZero: true }
+                }
+            },
+            plugins: [ChartDataLabels]
+        }, "bolsaFamiliaLegend");
+
+        // Atualizar tabelas
+        updateDistrictTable(tableData.districtTableData);
+        updateUbsTable(tableData.ubsTableData);
+        updateCensusTable(tableData.censusTableData);
+    }
+
+    // Funções de atualização de legenda (existentes)
+    function updateLegend(chart, elementId) {
+        const legendContainer = document.getElementById(elementId);
+        if (!legendContainer) return;
+        legendContainer.innerHTML = '';
+
+        if (chart.data.datasets.length > 1) {
+            chart.data.datasets.forEach((dataset, i) => {
+                const legendItem = document.createElement('div');
+                legendItem.classList.add('legend-item');
+                legendItem.innerHTML = `
+                    <span class="legend-color" style="background-color: ${dataset.backgroundColor}"></span>
+                    ${dataset.label}
+                `;
+                legendItem.onclick = () => {
+                    chart.setDatasetVisibility(i, !chart.isDatasetVisible(i));
+                    chart.update();
+                    updateLegend(chart, elementId); // Re-render legend to update visibility
+                };
+                legendContainer.appendChild(legendItem);
+            });
+        } else if (chart.data.datasets.length === 1 && chart.data.datasets[0].label) {
+            const legendItem = document.createElement('div');
+            legendItem.classList.add('legend-item');
+            legendItem.innerHTML = `
+                <span class="legend-color" style="background-color: ${chart.data.datasets[0].backgroundColor}"></span>
+                ${chart.data.datasets[0].label}
+            `;
+            legendContainer.appendChild(legendItem);
+        }
+    }
+
+    // Funções de filtro e renderização (existentes)
+    districtFilter.addEventListener("change", renderDashboard);
+    ubsFilter.addEventListener("change", renderDashboard);
+    vulnerabilityFilter.addEventListener("change", renderDashboard);
+    ageGroupFilter.addEventListener("change", renderDashboard);
+    censusTableSearch.addEventListener("keyup", renderDashboard);
+
+    // Funções de tabela (existentes)
+    function updateDistrictTable(data) {
+        districtTableBody.innerHTML = '';
+        data.forEach(item => {
+            const row = districtTableBody.insertRow();
+            row.innerHTML = `
+                <td>${item.district}</td>
+                <td>${item.pop2010.toLocaleString('pt-BR')}</td>
+                <td>${item.pop2022.toLocaleString('pt-BR')}</td>
+                <td class="${item.growth > 0 ? 'growth-positive' : 'growth-negative'}">${item.growth}</td>
+                <td class="${item.growth > 0 ? 'growth-positive' : 'growth-negative'}">${item.growthPct}</td>
+            `;
+        });
+    }
+
+    function updateUbsTable(data) {
+        ubsTableBody.innerHTML = '';
+        data.forEach(item => {
+            const row = ubsTableBody.insertRow();
+            row.innerHTML = `
+                <td>${item.ubs}</td>
+                <td>${item.population.toLocaleString('pt-BR')}</td>
+                <td>${item.vulnerability}</td>
+                <td>${item.ageGroup}</td>
+                <td><span class="badge badge-success">${item.status}</span></td>
+            `;
+        });
+    }
+
+    function updateCensusTable(data) {
+        censusTableBody.innerHTML = '';
+        const searchTerm = censusTableSearch.value.toLowerCase();
+        const filteredData = data.filter(row => 
+            row.FAIXA_ETARIA.toLowerCase().includes(searchTerm) || 
+            Object.values(row).some(val => String(val).toLowerCase().includes(searchTerm))
+        );
+
+        filteredData.forEach(item => {
+            const row = censusTableBody.insertRow();
+            row.innerHTML = `
+                <td class="sticky-column">${item.FAIXA_ETARIA}</td>
+                <td>${item.ELDORADO.toLocaleString('pt-BR')}</td>
+                <td>${item.RESSACA.toLocaleString('pt-BR')}</td>
+                <td>${item.SEDE.toLocaleString('pt-BR')}</td>
+                <td>${item.INDUSTRIAL.toLocaleString('pt-BR')}</td>
+                <td>${item.RIACHO.toLocaleString('pt-BR')}</td>
+                <td>${item.NACIONAL.toLocaleString('pt-BR')}</td>
+                <td>${item.VARGEM_DAS_FLORES.toLocaleString('pt-BR')}</td>
+                <td>${item.PETROLANDIA.toLocaleString('pt-BR')}</td>
+                <td class="total-column total-cell">${item.Total.toLocaleString('pt-BR')}</td>
+            `;
+        });
+    }
+
+    // Funções de download e limpeza (existentes)
+    window.downloadExcel = function() {
+        const wb = XLSX.utils.book_new();
+        const ws_data = [
+            ["Distrito", "População 2010", "População 2022", "Crescimento", "% Crescimento"],
+            ...processedData.districtTableData.map(d => [d.district, d.pop2010, d.pop2022, d.growth, d.growthPct])
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(ws_data);
+        XLSX.utils.book_append_sheet(wb, ws, "População por Distrito");
+        XLSX.writeFile(wb, "dados_censo_contagem.xlsx");
+    };
+
+    window.clearFilters = function() {
+        ubsFilter.value = "";
+        vulnerabilityFilter.value = "";
+        ageGroupFilter.value = "";
+        districtFilter.value = "";
+        censusTableSearch.value = "";
+        renderDashboard();
+    };
+
+    // Renderizar dashboard na carga inicial
+    renderDashboard();
+});
+
+
